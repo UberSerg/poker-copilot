@@ -4,6 +4,12 @@ import type { PlayerState } from './PlayerState'
 import type { Position } from './Position'
 import type { Street } from './Street'
 
+/**
+ * Bet level (currentBet) at which the player last voluntarily acted this street.
+ * `null` = has not voluntarily acted yet (blinds do not count).
+ */
+export type LastActedBetLevel = Record<Position, number | null>
+
 export interface PokerState {
   gameMode: Extract<GameMode, 'CASH'>
   smallBlind: number
@@ -13,19 +19,21 @@ export interface PokerState {
   heroCards: HeroCards
   board: BoardCards
   street: Street
-  /** Kept in sync with sum(committedTotal); selectors may recompute for invariants. */
+  /** Cached convenience; must equal sum(committedTotal). */
   pot: number
   currentBet: number
   /**
-   * Minimum legal raise-to amount (absolute chips to put in as the new currentBet).
-   * Updated on full raises; short all-in raises do not re-open a full raise size.
+   * Minimum legal full raise-to (absolute chips).
+   * After a short all-in: currentBet + lastFullRaiseSize (lastFullRaiseSize unchanged).
    */
   minimumRaiseTo: number
-  /** Size of the last full raise increment (for NLHE min-raise). */
+  /** Size of the last full raise increment (for NLHE min-raise / reopening). */
   lastFullRaiseSize: number
   actingPosition: Position | null
   lastAggressor: Position | null
+  /** Secondary/derived; prefer lastActedBetLevel for completion & raise rights. */
   playersActedThisRound: Position[]
+  lastActedBetLevel: LastActedBetLevel
   actionHistory: PokerActionRecord[]
   handComplete: boolean
 }
@@ -41,6 +49,8 @@ export type DomainErrorCode =
   | 'DUPLICATE_CARD'
   | 'INVALID_STACK'
   | 'STREET_NOT_COMPLETE'
+  | 'BETTING_ROUND_COMPLETE'
+  | 'SETUP_LOCKED'
   | 'HAND_COMPLETE'
   | 'UNSUPPORTED'
 

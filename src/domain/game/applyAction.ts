@@ -1,10 +1,11 @@
 import { getPot } from '../math/pot'
 import type { PokerAction, PokerActionRecord } from './PokerAction'
-import type { DomainResult, PokerState } from './PokerState'
+import type { DomainResult, LastActedBetLevel, PokerState } from './PokerState'
 import type { Position } from './Position'
 import { isPlayerInHand } from './PlayerState'
 import { POSITION_ORDER } from './Position'
-import { nextActor } from './transitions'
+import { contenders } from './raiseRights'
+import { findNextActingPosition, isBettingRoundComplete } from './transitions'
 import { validateAction } from './validators'
 
 function clonePlayers(state: PokerState): PokerState['players'] {
@@ -38,30 +39,16 @@ function appendHistory(
   ]
 }
 
-function afterActionActor(
-  state: PokerState,
-  actor: Position,
-  players: PokerState['players'],
-  lastAggressor: Position | null,
-  playersActedThisRound: Position[],
-): Position | null {
-  const draft: PokerState = {
-    ...state,
-    players,
-    lastAggressor,
-    playersActedThisRound,
-  }
-
-  const inHand = POSITION_ORDER.filter((position) => isPlayerInHand(players[position]))
-  if (inHand.length <= 1) {
-    return null
-  }
-
-  return nextActor(draft, actor)
-}
-
 function markActed(list: Position[], position: Position): Position[] {
   return list.includes(position) ? list : [...list, position]
+}
+
+function withActedLevel(
+  levels: LastActedBetLevel,
+  position: Position,
+  betLevel: number,
+): LastActedBetLevel {
+  return { ...levels, [position]: betLevel }
 }
 
 export function applyAction(state: PokerState, action: PokerAction): DomainResult<PokerState> {
@@ -80,14 +67,17 @@ export function applyAction(state: PokerState, action: PokerAction): DomainResul
   let minimumRaiseTo = state.minimumRaiseTo
   let lastFullRaiseSize = state.lastFullRaiseSize
   let playersActedThisRound = markActed(state.playersActedThisRound, action.position)
+  let lastActedBetLevel = state.lastActedBetLevel
   let handComplete = state.handComplete
 
   switch (action.type) {
     case 'FOLD': {
       players[action.position] = { ...player, folded: true }
+      lastActedBetLevel = withActedLevel(lastActedBetLevel, action.position, currentBet)
       break
     }
     case 'CHECK': {
+      lastActedBetLevel = withActedLevel(lastActedBetLevel, action.position, currentBet)
       break
     }
     case 'CALL': {
@@ -100,6 +90,7 @@ export function applyAction(state: PokerState, action: PokerAction): DomainResul
         committedTotal: player.committedTotal + needed,
         allIn: stackChips === 0,
       }
+      lastActedBetLevel = withActedLevel(lastActedBetLevel, action.position, currentBet)
       break
     }
     case 'BET': {
@@ -116,16 +107,16 @@ export function applyAction(state: PokerState, action: PokerAction): DomainResul
       lastFullRaiseSize = currentBet
       minimumRaiseTo = currentBet + lastFullRaiseSize
       lastAggressor = action.position
-      // New aggression re-opens action for others
       playersActedThisRound = [action.position]
+      lastActedBetLevel = withActedLevel(lastActedBetLevel, action.position, currentBet)
       break
     }
     case 'RAISE': {
       /**
        * Raise is always absolute raise-to.
-       * Full raise: raiseTo - currentBet >= lastFullRaiseSize (or meets minimumRaiseTo).
-       * Short all-in raise: may be below min-raise; updates currentBet but does not
-       * refresh lastFullRaiseSize / full minimumRaiseTo window for remaining players.
+       * Full raise: refreshes lastFullRaiseSize and reopens raise rights via bet-level delta.
+       * Short all-in: updates currentBet; lastFullRaiseSize unchanged;
+       * minimumRaiseTo becomes currentBet + lastFullRaiseSize.
        */
       const raiseTo = action.raiseToChips
       const add = raiseTo - player.committedThisStreet
@@ -147,10 +138,11 @@ export function applyAction(state: PokerState, action: PokerAction): DomainResul
         lastAggressor = action.position
         playersActedThisRound = [action.position]
       } else {
-        // Short all-in: does not reopen full raise sizing; others still need to match currentBet
+        // Short all-in: keep lastFullRaiseSize; bump min full raise-to against new currentBet.
+        minimumRaiseTo = currentBet + lastFullRaiseSize
         lastAggressor = action.position
-        playersActedThisRound = [action.position]
       }
+      lastActedBetLevel = withActedLevel(lastActedBetLevel, action.position, currentBet)
       break
     }
     case 'POST_BLIND': {
@@ -167,11 +159,7 @@ export function applyAction(state: PokerState, action: PokerAction): DomainResul
     handComplete = true
   }
 
-  const actingPosition = handComplete
-    ? null
-    : afterActionActor(state, action.position, players, lastAggressor, playersActedThisRound)
-
-  const nextState: PokerState = {
+  const draft: PokerState = {
     ...state,
     players,
     pot: potAfter,
@@ -180,10 +168,20 @@ export function applyAction(state: PokerState, action: PokerAction): DomainResul
     lastFullRaiseSize,
     lastAggressor,
     playersActedThisRound,
-    actingPosition,
+    lastActedBetLevel,
     actionHistory,
     handComplete,
+    actingPosition: null,
   }
 
-  return { ok: true, state: nextState }
+  if (handComplete || contenders(draft).length <= 1) {
+    return { ok: true, state: { ...draft, actingPosition: null, handComplete: true } }
+  }
+
+  if (isBettingRoundComplete(draft)) {
+    return { ok: true, state: { ...draft, actingPosition: null } }
+  }
+
+  const actingPosition = findNextActingPosition(draft, action.position)
+  return { ok: true, state: { ...draft, actingPosition } }
 }

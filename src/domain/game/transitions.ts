@@ -1,31 +1,18 @@
-import { isPlayerActive, isPlayerInHand } from './PlayerState'
-import type { PokerState } from './PokerState'
+import { getPot } from '../math/pot'
+import type { DomainResult, PokerState } from './PokerState'
 import type { Position } from './Position'
 import { POSITION_ORDER, positionsAfter } from './Position'
-import type { DomainResult } from './PokerState'
 import { nextStreet } from './Street'
-import { getPot } from '../math/pot'
-
-function contenders(state: PokerState): Position[] {
-  return POSITION_ORDER.filter((position) => isPlayerInHand(state.players[position]))
-}
-
-function activeContenders(state: PokerState): Position[] {
-  return contenders(state).filter((position) => isPlayerActive(state.players[position]))
-}
+import {
+  activeContenders,
+  contenders,
+  emptyLastActedBetLevel,
+  playerNeedsAction,
+} from './raiseRights'
 
 export function firstToActPostflop(state: PokerState): Position | null {
   for (const position of positionsAfter('BTN')) {
-    if (isPlayerActive(state.players[position])) {
-      return position
-    }
-  }
-  return null
-}
-
-export function nextActor(state: PokerState, from: Position): Position | null {
-  for (const position of positionsAfter(from)) {
-    if (isPlayerActive(state.players[position])) {
+    if (playerNeedsAction(state, position)) {
       return position
     }
   }
@@ -33,9 +20,29 @@ export function nextActor(state: PokerState, from: Position): Position | null {
 }
 
 /**
- * Betting round is complete when every non-folded, non-all-in player has matched
- * currentBet (or checked when currentBet is 0) and everyone who can act has acted
- * at least once after the last aggression (or since round start for check-around).
+ * Next player who still needs a voluntary decision.
+ * Returns null when the betting round is complete.
+ */
+export function nextActor(state: PokerState, from: Position): Position | null {
+  if (isBettingRoundComplete(state)) {
+    return null
+  }
+  for (const position of positionsAfter(from)) {
+    if (playerNeedsAction(state, position)) {
+      return position
+    }
+  }
+  return null
+}
+
+export function findNextActingPosition(state: PokerState, from: Position): Position | null {
+  return nextActor(state, from)
+}
+
+/**
+ * Round complete when every active player has matched currentBet and has acted
+ * voluntarily at least once this street (lastActedBetLevel !== null).
+ * Check-around: currentBet === 0 and every active player checked.
  */
 export function isBettingRoundComplete(state: PokerState): boolean {
   if (state.handComplete) {
@@ -52,16 +59,8 @@ export function isBettingRoundComplete(state: PokerState): boolean {
     return true
   }
 
-  const unmatched = canAct.filter(
-    (position) => state.players[position].committedThisStreet !== state.currentBet,
-  )
-  if (unmatched.length > 0) {
-    return false
-  }
-
-  // Everyone able to act must have acted this round
   for (const position of canAct) {
-    if (!state.playersActedThisRound.includes(position)) {
+    if (playerNeedsAction(state, position)) {
       return false
     }
   }
@@ -112,7 +111,7 @@ export function advanceStreet(state: PokerState): DomainResult<PokerState> {
     }
   }
 
-  const next: PokerState = {
+  const draft: PokerState = {
     ...state,
     players,
     street: following,
@@ -122,9 +121,16 @@ export function advanceStreet(state: PokerState): DomainResult<PokerState> {
     lastFullRaiseSize: state.bigBlind,
     lastAggressor: null,
     playersActedThisRound: [],
-    actingPosition: firstToActPostflop({ ...state, players }),
+    lastActedBetLevel: emptyLastActedBetLevel(),
+    actingPosition: null,
     handComplete: false,
   }
 
-  return { ok: true, state: next }
+  return {
+    ok: true,
+    state: {
+      ...draft,
+      actingPosition: firstToActPostflop(draft),
+    },
+  }
 }

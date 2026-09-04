@@ -122,6 +122,16 @@ DoD:
 - Golden tests для preflop raise/call, 3-bet pot, postflop bet/call, all-in.
 - Ни одного вычисления pot odds в UI.
 
+### Betting Core Hardening — complete ✅
+
+Ужесточение перед Hand Evaluator / Equity:
+
+- round complete ⇒ `actingPosition = null`;
+- per-player raise reopening (`lastActedBetLevel`);
+- short all-in / cumulative short all-ins;
+- effective stack = chips behind; SPR от текущего pot;
+- setup locking для starting stacks / Hero.
+
 ---
 
 ## V0.4 — Hand Evaluator

@@ -59,6 +59,12 @@
   align-items: center;
 }
 
+.behind-stack,
+.behind-hint {
+  margin-top: 0.2rem;
+  color: #b7c7b3;
+}
+
 .player-seat-stack input {
   width: 3.5rem;
   border: 1px solid #4d664d;

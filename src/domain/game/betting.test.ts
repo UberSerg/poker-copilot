@@ -4,7 +4,7 @@ import { setBoardCard, setHeroCard } from '../game/cardEdits'
 import { createInitialState, newHand } from '../game/createInitialState'
 import { getLegalActions } from '../game/legalActions'
 import { getHandMetrics, getUsedCards } from '../game/selectors'
-import { setHeroPosition, setPlayerStackBb } from '../game/stackEdits'
+import { setHeroPosition, setPlayerStartingStackBb } from '../game/stackEdits'
 import { advanceStreet, isBettingRoundComplete } from '../game/transitions'
 import { getAmountToCall, getPot } from '../math/pot'
 import { getPotOdds } from '../math/potOdds'
@@ -67,7 +67,7 @@ describe('betting actions', () => {
 
   it('calls correct amount including short all-in', () => {
     let state = createInitialState()
-    const short = setPlayerStackBb(state, 'UTG', 0.5)
+    const short = setPlayerStartingStackBb(state, 'UTG', 0.5)
     expect(short.ok).toBe(true)
     if (!short.ok) return
     state = short.state
@@ -208,8 +208,10 @@ describe('legal actions & metrics', () => {
 
 describe('helpers', () => {
   it('new hand and hero position', () => {
-    const state = setHeroPosition(createInitialState(), 'CO')
-    const fresh = newHand(state)
+    const positioned = setHeroPosition(createInitialState(), 'CO')
+    expect(positioned.ok).toBe(true)
+    if (!positioned.ok) return
+    const fresh = newHand(positioned.state)
     expect(fresh.heroPosition).toBe('CO')
     expect(fresh.pot).toBe(150)
     expect(fresh.heroCards).toEqual([null, null])

@@ -2,12 +2,20 @@ import type { PokerAction } from './PokerAction'
 import type { DomainError, PokerState } from './PokerState'
 import { getAmountToCall } from '../math/pot'
 import { isPlayerActive } from './PlayerState'
+import { canPlayerRaise } from './raiseRights'
+import { isBettingRoundComplete } from './transitions'
 
 export function validateActor(state: PokerState, position: PokerAction['position']): DomainError | null {
   if (state.handComplete) {
     return { code: 'HAND_COMPLETE', message: 'Hand is already complete' }
   }
-  if (state.actingPosition !== null && state.actingPosition !== position) {
+  if (isBettingRoundComplete(state) || state.actingPosition === null) {
+    return {
+      code: 'BETTING_ROUND_COMPLETE',
+      message: 'Betting round is complete; advance street instead',
+    }
+  }
+  if (state.actingPosition !== position) {
     return { code: 'WRONG_ACTOR', message: `Expected actor ${state.actingPosition}` }
   }
   const player = state.players[position]
@@ -56,7 +64,6 @@ export function validateAction(state: PokerState, action: PokerAction): DomainEr
       if (action.amountChips > player.stackChips) {
         return { code: 'ILLEGAL_BET', message: 'Bet exceeds stack' }
       }
-      // Open bet minimum is big blind when stack allows
       if (action.amountChips < state.bigBlind && action.amountChips < player.stackChips) {
         return { code: 'ILLEGAL_BET', message: 'Bet below minimum' }
       }
@@ -65,6 +72,9 @@ export function validateAction(state: PokerState, action: PokerAction): DomainEr
     case 'RAISE': {
       if (state.currentBet <= 0) {
         return { code: 'ILLEGAL_RAISE', message: 'Cannot raise without a current bet; bet instead' }
+      }
+      if (!canPlayerRaise(state, action.position)) {
+        return { code: 'ILLEGAL_RAISE', message: 'Raise is not reopened for this player' }
       }
       if (!Number.isInteger(action.raiseToChips) || action.raiseToChips <= 0) {
         return { code: 'ILLEGAL_RAISE', message: 'Raise-to must be a positive integer' }

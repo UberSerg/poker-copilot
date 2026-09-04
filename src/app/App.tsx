@@ -9,7 +9,7 @@ import {
   setBoardCard,
   setHeroCard,
   setHeroPosition,
-  setPlayerStackBb,
+  setPlayerStartingStackBb,
 } from '../domain/game'
 import type { Card } from '../domain/cards/Card'
 import type { PokerAction } from '../domain/game/PokerAction'
@@ -149,9 +149,16 @@ export function App() {
           <PokerTable
             state={state}
             selectedSlot={selectedSlotKey()}
-            onSelectHero={(position: Position) => pushState(setHeroPosition(state, position))}
-            onStackChange={(position, stackBb) => {
-              const result = setPlayerStackBb(state, position, stackBb)
+            onSelectHero={(position: Position) => {
+              const result = setHeroPosition(state, position)
+              if (!result.ok) {
+                setError(translateError(result.error))
+                return
+              }
+              pushState(result.state)
+            }}
+            onStartingStackChange={(position, startingStackBb) => {
+              const result = setPlayerStartingStackBb(state, position, startingStackBb)
               if (!result.ok) {
                 setError(translateError(result.error))
                 return

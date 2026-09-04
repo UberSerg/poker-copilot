@@ -20,6 +20,63 @@ UI
 React вызывает только domain API (`applyAction`, `setHeroCard`, …) и читает selectors.
 Формулы pot odds / SPR / to-call живут в `src/domain/math` и `src/domain/game/selectors.ts`, не в JSX.
 
+## Betting core hardening
+
+### Betting round completion
+
+После каждого `applyAction`:
+
+1. строится новый `PokerState`;
+2. если `isBettingRoundComplete` — `actingPosition = null`;
+3. иначе `actingPosition` = следующий игрок, которому ещё нужно действие.
+
+Invariant: round complete ⇒ `actingPosition === null`.
+В этом состоянии разрешён только `advanceStreet()`; FOLD/CHECK/CALL/BET/RAISE → `BETTING_ROUND_COMPLETE`.
+
+Round complete, когда каждый active player:
+
+- `committedThisStreet === currentBet` (или check при `currentBet === 0`);
+- и `lastActedBetLevel[position] !== null` (добровольное действие на улице уже было).
+
+### Raise rights / short all-in
+
+`lastActedBetLevel[position]`:
+
+- `null` — игрок ещё не добровольно действовал на улице (блайнды не считаются);
+- иначе — уровень `currentBet` на момент последнего действия.
+
+`canPlayerRaise`:
+
+- не действовал (`null`) → raise открыт;
+- уже действовал → raise открыт только если `currentBet - lastActedBetLevel >= lastFullRaiseSize`.
+
+Неполный all-in raise:
+
+- поднимает `currentBet`;
+- **не** меняет `lastFullRaiseSize`;
+- `minimumRaiseTo = currentBet + lastFullRaiseSize`.
+
+### Effective stack / SPR
+
+Для текущего решения:
+
+- effective stack = `min(hero.stackChips, contender.stackChips…)` — chips **behind**, без committed;
+- multiway: минимум между Hero и оставшимися contenders (промежуточное правило);
+- `SPR = effectiveStackBehind / currentPot`.
+
+### Setup locking
+
+`canEditHandSetup` = в истории только `POST_BLIND`.
+
+До первого voluntary action можно менять starting stacks и Hero.
+`setPlayerStartingStackBb` задаёт **начальный** стек; behind = starting − committed (уже посты блайндов).
+После fold/call/check/bet/raise — `SETUP_LOCKED`.
+
+### Pot invariant
+
+`getPot(state) = sum(committedTotal)` — source of truth.
+`state.pot` — cache; `validateStateInvariants` проверяет равенство и economics `starting = stack + committedTotal`.
+
 ## Game modes
 
 См. `docs/GAME_MODES.md`.
@@ -68,6 +125,8 @@ src/
       validators.ts
       legalActions.ts
       transitions.ts
+      raiseRights.ts
+      invariants.ts
       selectors.ts
       cardEdits.ts
       stackEdits.ts

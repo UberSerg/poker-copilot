@@ -3,6 +3,7 @@ import type { Position } from './Position'
 import { POSITIONS_6MAX } from './Position'
 import type { PokerActionRecord } from './PokerAction'
 import type { PokerState } from './PokerState'
+import { emptyLastActedBetLevel } from './raiseRights'
 
 export const DEFAULT_SMALL_BLIND = 50
 export const DEFAULT_BIG_BLIND = 100
@@ -49,16 +50,22 @@ export function createInitialState(options?: {
   smallBlind?: number
   bigBlind?: number
   startingStackBb?: number
+  startingStacksBb?: Partial<Record<Position, number>>
 }): PokerState {
   const smallBlind = options?.smallBlind ?? DEFAULT_SMALL_BLIND
   const bigBlind = options?.bigBlind ?? DEFAULT_BIG_BLIND
-  const startingStackBb = options?.startingStackBb ?? DEFAULT_STARTING_STACK_BB
+  const defaultStartingBb = options?.startingStackBb ?? DEFAULT_STARTING_STACK_BB
   const heroPosition = options?.heroPosition ?? DEFAULT_HERO_POSITION
-  const startingStackChips = startingStackBb * bigBlind
 
   let players = Object.fromEntries(
-    POSITIONS_6MAX.map((position) => [position, createPlayer(position, startingStackChips)]),
+    POSITIONS_6MAX.map((position) => {
+      const stackBb = options?.startingStacksBb?.[position] ?? defaultStartingBb
+      return [position, createPlayer(position, stackBb * bigBlind)]
+    }),
   ) as Record<Position, PlayerState>
+
+  const sbStart = players.SB.startingStackChips
+  const bbStart = players.BB.startingStackChips
 
   const sb = postBlind(players, 'SB', smallBlind)
   players = sb.players
@@ -74,7 +81,7 @@ export function createInitialState(options?: {
       action: { type: 'POST_BLIND', position: 'SB', amountChips: sb.posted, blind: 'SB' },
       potBefore: 0,
       potAfter: sb.posted,
-      stackBefore: startingStackChips,
+      stackBefore: sbStart,
       stackAfter: players.SB.stackChips,
     },
     {
@@ -84,7 +91,7 @@ export function createInitialState(options?: {
       action: { type: 'POST_BLIND', position: 'BB', amountChips: bb.posted, blind: 'BB' },
       potBefore: sb.posted,
       potAfter: pot,
-      stackBefore: startingStackChips,
+      stackBefore: bbStart,
       stackAfter: players.BB.stackChips,
     },
   ]
@@ -99,12 +106,13 @@ export function createInitialState(options?: {
     board: [null, null, null, null, null],
     street: 'PREFLOP',
     pot,
-    currentBet: bigBlind,
+    currentBet: Math.max(players.SB.committedThisStreet, players.BB.committedThisStreet),
     minimumRaiseTo: bigBlind * 2,
     lastFullRaiseSize: bigBlind,
     actingPosition: 'UTG',
     lastAggressor: 'BB',
     playersActedThisRound: [],
+    lastActedBetLevel: emptyLastActedBetLevel(),
     actionHistory,
     handComplete: false,
   }

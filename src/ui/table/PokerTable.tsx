@@ -1,6 +1,7 @@
 import type { Card } from '../../domain/cards/Card'
 import type { PokerState } from '../../domain/game/PokerState'
 import type { Position } from '../../domain/game/Position'
+import { canEditHandSetup } from '../../domain/game/raiseRights'
 import { formatChipsAsBb } from '../../domain/game/selectors'
 import { ru } from '../../i18n/ru'
 import { PlayingCard } from '../cards/PlayingCard'
@@ -19,7 +20,7 @@ const SEAT_CLASS: Record<Position, string> = {
 interface PokerTableProps {
   state: PokerState
   onSelectHero: (position: Position) => void
-  onStackChange: (position: Position, stackBb: number) => void
+  onStartingStackChange: (position: Position, startingStackBb: number) => void
   onHeroCardClick: (index: 0 | 1) => void
   onBoardCardClick: (index: 0 | 1 | 2 | 3 | 4) => void
   selectedSlot: string | null
@@ -28,11 +29,13 @@ interface PokerTableProps {
 export function PokerTable({
   state,
   onSelectHero,
-  onStackChange,
+  onStartingStackChange,
   onHeroCardClick,
   onBoardCardClick,
   selectedSlot,
 }: PokerTableProps) {
+  const setupEditable = canEditHandSetup(state)
+
   return (
     <section className="poker-table-wrap" aria-label={ru.panels.table}>
       <div className="poker-table">
@@ -43,8 +46,9 @@ export function PokerTable({
               bigBlind={state.bigBlind}
               isHero={state.heroPosition === position}
               isActing={state.actingPosition === position}
+              setupEditable={setupEditable}
               onSelectHero={onSelectHero}
-              onStackChange={onStackChange}
+              onStartingStackChange={onStartingStackChange}
             />
           </div>
         ))}

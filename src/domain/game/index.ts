@@ -3,10 +3,17 @@ export { FULL_DECK } from '../cards/deck'
 export { createInitialState, newHand } from './createInitialState'
 export { applyAction } from './applyAction'
 export { getLegalActions } from './legalActions'
-export { advanceStreet, isBettingRoundComplete } from './transitions'
+export { advanceStreet, isBettingRoundComplete, nextActor } from './transitions'
 export { getHandMetrics, getUsedCards, formatChipsAsBb } from './selectors'
 export { setHeroCard, setBoardCard, clearHeroCards, clearBoard } from './cardEdits'
-export { setHeroPosition, setPlayerStackBb } from './stackEdits'
+export {
+  setHeroPosition,
+  setPlayerStartingStackBb,
+  setPlayerStackBb,
+  getStartingStackBb,
+} from './stackEdits'
+export { canPlayerRaise, canEditHandSetup, playerNeedsAction } from './raiseRights'
+export { validateStateInvariants, assertStateInvariants } from './invariants'
 export type { PokerState, DomainResult, DomainError } from './PokerState'
 export type { PokerAction, PokerActionRecord } from './PokerAction'
 export type { Position } from './Position'

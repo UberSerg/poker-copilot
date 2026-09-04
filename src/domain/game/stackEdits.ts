@@ -1,58 +1,93 @@
-import { bbToChips } from '../math/chips'
+import { bbToChips, chipsToBb } from '../math/chips'
 import type { DomainResult, PokerState } from './PokerState'
 import type { Position } from './Position'
 import { POSITIONS_6MAX } from './Position'
+import { canEditHandSetup } from './raiseRights'
 
 const MAX_STACK_BB = 1000
 
-export function setHeroPosition(state: PokerState, heroPosition: Position): PokerState {
-  return { ...state, heroPosition }
-}
-
-export function setPlayerStackBb(
+export function setHeroPosition(
   state: PokerState,
-  position: Position,
-  stackBb: number,
+  heroPosition: Position,
 ): DomainResult<PokerState> {
-  if (!Number.isFinite(stackBb) || stackBb <= 0 || stackBb > MAX_STACK_BB) {
+  if (!canEditHandSetup(state)) {
     return {
       ok: false,
-      error: { code: 'INVALID_STACK', message: 'Stack must be a positive BB amount' },
+      error: { code: 'SETUP_LOCKED', message: 'Cannot change Hero after voluntary actions' },
+    }
+  }
+  return { ok: true, state: { ...state, heroPosition } }
+}
+
+/**
+ * Sets the player's starting stack in BB during hand setup.
+ * Behind-the-lines stack is recomputed as starting − already posted commitments (blinds).
+ */
+export function setPlayerStartingStackBb(
+  state: PokerState,
+  position: Position,
+  startingStackBb: number,
+): DomainResult<PokerState> {
+  if (!canEditHandSetup(state)) {
+    return {
+      ok: false,
+      error: { code: 'SETUP_LOCKED', message: 'Cannot edit starting stacks after voluntary actions' },
+    }
+  }
+
+  if (!Number.isFinite(startingStackBb) || startingStackBb <= 0 || startingStackBb > MAX_STACK_BB) {
+    return {
+      ok: false,
+      error: { code: 'INVALID_STACK', message: 'Starting stack must be a positive BB amount' },
     }
   }
 
   const player = state.players[position]
-  const committedLocked = player.committedTotal
-  const desiredTotal = bbToChips(stackBb, state.bigBlind)
+  const startingStackChips = bbToChips(startingStackBb, state.bigBlind)
 
-  // Interpret stackBb as remaining stack behind (display), not starting stack.
-  // Minimum remaining is 0; starting stack reconstructs as remaining + committedTotal.
-  if (desiredTotal < 0) {
-    return { ok: false, error: { code: 'INVALID_STACK', message: 'Stack cannot be negative' } }
+  if (startingStackChips < player.committedTotal) {
+    return {
+      ok: false,
+      error: {
+        code: 'INVALID_STACK',
+        message: 'Starting stack cannot be below already posted blind',
+      },
+    }
   }
 
-  const stackChips = desiredTotal
-  const startingStackChips = stackChips + committedLocked
-
+  const stackChips = startingStackChips - player.committedTotal
   const players = { ...state.players }
   players[position] = {
     ...player,
-    stackChips,
     startingStackChips,
+    stackChips,
     allIn: stackChips === 0 && !player.folded,
   }
 
   return { ok: true, state: { ...state, players } }
 }
 
-export function setAllStacksBb(state: PokerState, stackBb: number): DomainResult<PokerState> {
+/** @deprecated Use setPlayerStartingStackBb */
+export function setPlayerStackBb(
+  state: PokerState,
+  position: Position,
+  stackBb: number,
+): DomainResult<PokerState> {
+  return setPlayerStartingStackBb(state, position, stackBb)
+}
+
+export function setAllStartingStacksBb(state: PokerState, stackBb: number): DomainResult<PokerState> {
   let next: PokerState = state
   for (const position of POSITIONS_6MAX) {
-    const result = setPlayerStackBb(next, position, stackBb)
+    const result = setPlayerStartingStackBb(next, position, stackBb)
     if (!result.ok) {
       return result
     }
     next = result.state
   }
   return { ok: true, state: next }
+}
+
+export function getStartingStackBb(state: PokerState, position: Position): number {
+  return chipsToBb(state.players[position].startingStackChips, state.bigBlind)
 }

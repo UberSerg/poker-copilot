@@ -23,6 +23,13 @@ export function getAmountToCall(state: PokerState, position: Position): number {
   return Math.min(needed, player.stackChips)
 }
 
+/**
+ * Effective stack for the current decision = chips remaining behind Hero and
+ * relevant opponents (not including already committed chips this street).
+ *
+ * Heads-up: min(hero.stackChips, villain.stackChips)
+ * Multiway: min(hero.stackChips, min remaining contender stacks) — documented interim rule.
+ */
 export function getEffectiveStackChips(
   state: PokerState,
   heroPosition: Position = state.heroPosition,
@@ -39,11 +46,6 @@ export function getEffectiveStackChips(
     return null
   }
 
-  const heroEffective = hero.stackChips + hero.committedThisStreet
-  const opponentEffectives = opponents.map((position) => {
-    const player = state.players[position]
-    return player.stackChips + player.committedThisStreet
-  })
-  const minOpponent = Math.min(...opponentEffectives)
-  return Math.min(heroEffective, minOpponent)
+  const opponentStacks = opponents.map((position) => state.players[position].stackChips)
+  return Math.min(hero.stackChips, ...opponentStacks)
 }

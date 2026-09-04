@@ -9,8 +9,9 @@ interface PlayerSeatProps {
   bigBlind: number
   isHero: boolean
   isActing: boolean
+  setupEditable: boolean
   onSelectHero: (position: Position) => void
-  onStackChange: (position: Position, stackBb: number) => void
+  onStartingStackChange: (position: Position, startingStackBb: number) => void
 }
 
 export function PlayerSeat({
@@ -18,11 +19,12 @@ export function PlayerSeat({
   bigBlind,
   isHero,
   isActing,
+  setupEditable,
   onSelectHero,
-  onStackChange,
+  onStartingStackChange,
 }: PlayerSeatProps) {
-  const stackBb = chipsToBb(player.stackChips, bigBlind)
-  const committedBb = chipsToBb(player.committedThisStreet, bigBlind)
+  const behindBb = chipsToBb(player.stackChips, bigBlind)
+  const startingBb = chipsToBb(player.startingStackChips, bigBlind)
   const status = player.folded
     ? ru.labels.statusFold
     : player.allIn
@@ -48,35 +50,46 @@ export function PlayerSeat({
 
       <div className="player-seat-stack">
         <label>
-          {ru.labels.stack}
+          {ru.labels.startingStack}
           <input
             type="number"
             min={1}
             max={1000}
             step={1}
-            value={Number.isFinite(stackBb) ? stackBb : ''}
+            disabled={!setupEditable}
+            value={Number.isFinite(startingBb) ? startingBb : ''}
             onChange={(event) => {
               const value = Number(event.target.value)
               if (!Number.isFinite(value) || value <= 0) {
                 return
               }
-              onStackChange(player.position, value)
+              onStartingStackChange(player.position, value)
             }}
           />
           <span>{ru.labels.bb}</span>
         </label>
+        <div className="behind-stack">
+          {ru.labels.stack}: {formatBb(player.stackChips, bigBlind)} {ru.labels.bb}
+        </div>
       </div>
 
       <div className="player-seat-meta">
         <div>
           {ru.labels.inPot}: {formatBb(player.committedThisStreet, bigBlind)} {ru.labels.bb}
-          {committedBb > 0 ? '' : ''}
         </div>
         <div>{status}</div>
+        <div className="behind-hint">
+          {ru.labels.behind}: {behindBb} {ru.labels.bb}
+        </div>
       </div>
 
       {!isHero ? (
-        <button type="button" className="set-hero-btn" onClick={() => onSelectHero(player.position)}>
+        <button
+          type="button"
+          className="set-hero-btn"
+          disabled={!setupEditable}
+          onClick={() => onSelectHero(player.position)}
+        >
           {ru.buttons.setHero}
         </button>
       ) : null}
