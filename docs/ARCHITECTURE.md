@@ -20,6 +20,35 @@ UI
 React вызывает только domain API (`applyAction`, `setHeroCard`, …) и читает selectors.
 Формулы pot odds / SPR / to-call живут в `src/domain/math` и `src/domain/game/selectors.ts`, не в JSX.
 
+## Equity / Hand Evaluator flow
+
+```text
+PokerState
+   ↓
+EquityInput selector (equitySelectors)
+   ↓
+EquityWorkerClient (monotonic requestId)
+   ↓
+Web Worker
+   ↓
+Equity Engine
+   ├── Exact Enumeration (combinations)
+   └── Monte Carlo (seeded RNG, sampling w/o replacement)
+          ↓
+     Strength compare (@pokertools/evaluator via adapter)
+          +
+     NativeHandEvaluator (bestFive + RU labels for UI/showdown)
+```
+
+Правила:
+
+- Worker / calculation status **не** входит в `PokerState` (`EquityCalculationState` в app layer).
+- Third-party evaluator API не протекает в UI — только adapter + strength helper.
+- Random opponent = равномерные legal hole combinations; это **не** poker range.
+- Decision / recommendation engine отсутствует.
+
+`MAX_EXACT_COMBINATIONS = 20_000` — выше порога используется Monte Carlo.
+
 ## Betting core hardening
 
 ### Betting round completion
