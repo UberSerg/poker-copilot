@@ -1,0 +1,74 @@
+.equity-panel h2 {
+  margin: 0 0 0.55rem;
+  font-size: 1.05rem;
+}
+
+.equity-precision {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.55rem;
+}
+
+.equity-precision select {
+  border: 1px solid #c5d0bc;
+  border-radius: 0.3rem;
+  padding: 0.3rem 0.4rem;
+}
+
+.equity-stats {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.equity-stats > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid #d5dec8;
+  padding-bottom: 0.25rem;
+}
+
+.equity-stats dt {
+  color: #5b6756;
+}
+
+.equity-stats dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.equity-loading,
+.equity-blocked,
+.equity-hint,
+.equity-error {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+}
+
+.equity-error {
+  color: #8a1f14;
+}
+
+.equity-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.equity-spinner {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid #b7c5b0;
+  border-top-color: #2f6b3a;
+  border-radius: 50%;
+  animation: equity-spin 0.7s linear infinite;
+}
+
+@keyframes equity-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

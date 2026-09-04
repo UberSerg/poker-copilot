@@ -17,6 +17,8 @@ export interface PokerState {
   heroPosition: Position
   players: Record<Position, PlayerState>
   heroCards: HeroCards
+  /** Exact villain hole cards for showdown/equity; nulls mean unset. */
+  opponentCards: HeroCards
   board: BoardCards
   street: Street
   /** Cached convenience; must equal sum(committedTotal). */

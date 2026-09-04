@@ -24,7 +24,7 @@ export interface HandMetrics {
 }
 
 export function getUsedCards(state: PokerState): Set<Card> {
-  return collectUsedCards([...state.heroCards, ...state.board])
+  return collectUsedCards([...state.heroCards, ...state.opponentCards, ...state.board])
 }
 
 export function getHandMetrics(state: PokerState, forPosition: Position = state.heroPosition): HandMetrics {

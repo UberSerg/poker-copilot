@@ -54,3 +54,25 @@ export function setBoardCard(
 export function clearBoard(state: PokerState): PokerState {
   return { ...state, board: [null, null, null, null, null] }
 }
+
+export function setOpponentCard(
+  state: PokerState,
+  index: 0 | 1,
+  card: Card | null,
+): DomainResult<PokerState> {
+  const previous = state.opponentCards[index]
+  if (card !== null) {
+    const used = usedWithout(state, previous)
+    if (used.has(card)) {
+      return { ok: false, error: { code: 'DUPLICATE_CARD', message: 'Card is already used' } }
+    }
+  }
+
+  const opponentCards: HeroCards = [...state.opponentCards]
+  opponentCards[index] = card
+  return { ok: true, state: { ...state, opponentCards } }
+}
+
+export function clearOpponentCards(state: PokerState): PokerState {
+  return { ...state, opponentCards: [null, null] }
+}

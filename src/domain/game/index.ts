@@ -5,7 +5,7 @@ export { applyAction } from './applyAction'
 export { getLegalActions } from './legalActions'
 export { advanceStreet, isBettingRoundComplete, nextActor } from './transitions'
 export { getHandMetrics, getUsedCards, formatChipsAsBb } from './selectors'
-export { setHeroCard, setBoardCard, clearHeroCards, clearBoard } from './cardEdits'
+export { setHeroCard, setBoardCard, clearHeroCards, clearBoard, setOpponentCard, clearOpponentCards } from './cardEdits'
 export {
   setHeroPosition,
   setPlayerStartingStackBb,
