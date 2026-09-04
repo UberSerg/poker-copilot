@@ -14,7 +14,25 @@
 
 ---
 
-## V0.0 — Foundation
+## Status legend
+
+- ✅ Done — реализовано в текущей ветке hand-builder core
+- 🚧 Active product scope — Cash only
+- ⏳ Later — не начинать без явного roadmap-этапа
+
+---
+
+## Game Modes architecture ✅
+
+См. `docs/GAME_MODES.md`.
+
+- Концептуально: `CASH | SNG | MTT`
+- Runtime сейчас: только Cash 6-max NLHE
+- Tournament logic запрещена без отдельного этапа
+
+---
+
+## V0.0 — Foundation ✅
 
 Цель: получить чистый репозиторий, который стабильно запускается и проверяется.
 
@@ -38,7 +56,7 @@ DoD:
 
 ---
 
-## V0.1 — Cards & Table UI
+## V0.1 — Cards & Table UI ✅
 
 Цель: вручную собрать визуальное состояние стола.
 
@@ -61,7 +79,7 @@ DoD:
 
 ---
 
-## V0.2 — PokerState & Action State Machine
+## V0.2 — PokerState & Action State Machine ✅
 
 Цель: перестать хранить раздачу как набор несвязанных полей UI.
 
@@ -85,7 +103,7 @@ DoD:
 
 ---
 
-## V0.3 — Pot Engine
+## V0.3 — Pot Engine ✅
 
 Цель: всегда правильно знать деньги в банке.
 
@@ -103,6 +121,16 @@ DoD:
 DoD:
 - Golden tests для preflop raise/call, 3-bet pot, postflop bet/call, all-in.
 - Ни одного вычисления pot odds в UI.
+
+### Betting Core Hardening — complete ✅
+
+Ужесточение перед Hand Evaluator / Equity:
+
+- round complete ⇒ `actingPosition = null`;
+- per-player raise reopening (`lastActedBetLevel`);
+- short all-in / cumulative short all-ins;
+- effective stack = chips behind; SPR от текущего pot;
+- setup locking для starting stacks / Hero.
 
 ---
 

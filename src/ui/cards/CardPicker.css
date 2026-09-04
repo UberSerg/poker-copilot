@@ -1,0 +1,91 @@
+.card-picker {
+  position: absolute;
+  z-index: 20;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, 92vw);
+  padding: 0.75rem;
+  background: #1d2a1d;
+  border: 1px solid #3e523e;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  color: #e8efe4;
+}
+
+.card-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.card-picker-header button {
+  background: transparent;
+  border: 0;
+  color: #e8efe4;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.card-picker-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.card-picker-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+}
+
+.card-picker-cell {
+  border: 1px solid #4a5f4a;
+  background: #f5f8f2;
+  border-radius: 0.25rem;
+  min-height: 2.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.card-picker-cell.is-red {
+  color: #c62828;
+}
+
+.card-picker-cell.is-black {
+  color: #1b1f1b;
+}
+
+.card-picker-cell.is-used,
+.card-picker-cell:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+.card-picker-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  gap: 0.5rem;
+}
+
+.card-picker-footer button {
+  border: 1px solid #6a7f6a;
+  background: #2a3b2a;
+  color: #e8efe4;
+  border-radius: 0.25rem;
+  padding: 0.3rem 0.55rem;
+  cursor: pointer;
+}
+
+.card-picker-footer button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.card-picker-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #9aab96;
+}
