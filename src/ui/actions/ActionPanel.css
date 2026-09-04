@@ -1,0 +1,50 @@
+.action-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.action-panel h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.actor-select,
+.size-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.actor-select select,
+.size-input input {
+  border: 1px solid #c5d0bc;
+  border-radius: 0.3rem;
+  padding: 0.35rem 0.45rem;
+  background: #fff;
+}
+
+.action-buttons,
+.quick-sizes,
+.utility-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.action-buttons button,
+.quick-sizes button,
+.utility-buttons button {
+  border: 1px solid #7d8f76;
+  background: #eef3e8;
+  border-radius: 0.3rem;
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+}
+
+.action-buttons button:disabled,
+.utility-buttons button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

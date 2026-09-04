@@ -1,6 +1,6 @@
 :root {
   color: #1a1f16;
-  background: #edf0e8;
+  background: linear-gradient(180deg, #e7eee2 0%, #d7e1d2 100%);
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-synthesis: none;
   font-weight: 400;

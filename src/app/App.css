@@ -1,72 +1,96 @@
 .app-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1rem 1.25rem 2rem;
+  color: #1d271c;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 2rem;
-  letter-spacing: 0.02em;
+  font-size: 1.8rem;
 }
 
 .app-subtitle {
-  margin: 0.35rem 0 0;
-  color: #4a5540;
+  margin: 0.25rem 0 0;
+  color: #556350;
 }
 
-.app-grid {
+.mode-badge {
+  border: 1px solid #b7c5b0;
+  background: #eef3ea;
+  border-radius: 0.4rem;
+  padding: 0.45rem 0.7rem;
+  white-space: nowrap;
+}
+
+.app-error {
+  margin-bottom: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  background: #fdecea;
+  border: 1px solid #e2a8a2;
+  color: #8a1f14;
+}
+
+.app-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-areas:
-    'table actions'
-    'metrics recommendation';
+  grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.9fr);
   gap: 1rem;
+  align-items: start;
 }
 
-.panel {
-  min-height: 10rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid #c7d0bc;
-  background: #f7f9f3;
+.app-main {
+  position: relative;
+  min-width: 0;
 }
 
-.panel h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1.1rem;
+.app-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
 }
 
-.panel-placeholder {
+.app-sidebar > section,
+.recommendation-panel,
+.debug-panel {
+  background: #f7faf4;
+  border: 1px solid #cfd9c8;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.recommendation-panel h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.recommendation-panel p {
   margin: 0;
-  color: #5c6754;
+  color: #5d6a58;
 }
 
-.panel-table {
-  grid-area: table;
+.debug-panel pre {
+  max-height: 240px;
+  overflow: auto;
+  font-size: 0.7rem;
+  background: #111;
+  color: #d6f5d0;
+  padding: 0.5rem;
 }
 
-.panel-actions {
-  grid-area: actions;
+.debug-panel button {
+  margin-bottom: 0.4rem;
 }
 
-.panel-metrics {
-  grid-area: metrics;
-}
-
-.panel-recommendation {
-  grid-area: recommendation;
-}
-
-@media (max-width: 900px) {
-  .app-grid {
+@media (max-width: 1100px) {
+  .app-layout {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      'table'
-      'actions'
-      'metrics'
-      'recommendation';
   }
 }

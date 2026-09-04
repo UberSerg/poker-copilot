@@ -1,0 +1,91 @@
+.player-seat {
+  position: absolute;
+  width: 9.5rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #3f5a3f;
+  border-radius: 0.5rem;
+  background: rgba(12, 22, 14, 0.88);
+  color: #e7efe4;
+  font-size: 0.78rem;
+}
+
+.player-seat.is-hero {
+  border-color: #d4b34a;
+  box-shadow: 0 0 0 1px rgba(212, 179, 74, 0.35);
+}
+
+.player-seat.is-acting {
+  box-shadow: 0 0 0 2px #7dcf7a;
+}
+
+.player-seat.is-folded {
+  opacity: 0.55;
+}
+
+.player-seat-top {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.player-seat-position {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.dealer-button {
+  display: inline-flex;
+  width: 1.2rem;
+  height: 1.2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f2f2f2;
+  color: #111;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.hero-badge {
+  margin-left: auto;
+  color: #f0d27a;
+  font-weight: 700;
+}
+
+.player-seat-stack label {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.player-seat-stack input {
+  width: 3.5rem;
+  border: 1px solid #4d664d;
+  background: #152016;
+  color: #e7efe4;
+  border-radius: 0.25rem;
+  padding: 0.15rem 0.25rem;
+}
+
+.player-seat-meta {
+  margin-top: 0.25rem;
+  color: #b7c7b3;
+}
+
+.set-hero-btn {
+  margin-top: 0.35rem;
+  width: 100%;
+  border: 1px solid #5a735a;
+  background: #243324;
+  color: #e7efe4;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.acting-tag {
+  margin-top: 0.3rem;
+  color: #9be08f;
+  font-weight: 700;
+}

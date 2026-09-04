@@ -1,0 +1,47 @@
+.playing-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 3.5rem;
+  border: 1px solid #2a3a2a;
+  border-radius: 0.35rem;
+  background: #f4f7f0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.playing-card-large {
+  width: 3.6rem;
+  height: 5rem;
+  font-size: 1.35rem;
+}
+
+.playing-card-empty {
+  color: #6a7a66;
+  background: rgba(255, 255, 255, 0.2);
+  border-style: dashed;
+}
+
+.playing-card-red {
+  color: #c62828;
+}
+
+.playing-card-black {
+  color: #1b1f1b;
+}
+
+.playing-card-selected {
+  outline: 2px solid #f0c040;
+  outline-offset: 2px;
+}
+
+.playing-card-clickable {
+  cursor: pointer;
+}
+
+.playing-card:disabled {
+  cursor: default;
+}

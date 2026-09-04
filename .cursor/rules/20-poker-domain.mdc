@@ -7,6 +7,7 @@ alwaysApply: false
 # Poker domain rules
 
 - Variant: 6-max NLHE cash until roadmap explicitly expands it.
+- Do not implement SNG, MTT, ICM, blind schedules, antes, bubble or payout logic without a dedicated roadmap stage.
 - Never allow duplicate physical cards across hole cards, board and explicit villain cards.
 - Betting actions must be validated against current PokerState.
 - Pot, contributions, to-call and stacks must derive from action history/state, not UI labels.

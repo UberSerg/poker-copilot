@@ -7,7 +7,8 @@ alwaysApply: true
 
 - Project is a local training/simulation Texas Hold'em calculator.
 - Do not add screen capture, OCR, auto-clicking, anti-detection, or real poker-room integration.
-- Current product scope is 6-max No-Limit Texas Hold'em cash.
+- Current product scope is 6-max No-Limit Texas Hold'em cash (`GameMode = 'CASH'`).
+- Do not implement SNG/MTT/tournament logic without an explicit roadmap stage (see `docs/GAME_MODES.md`).
 - UI language is Russian.
 - Code identifiers, filenames, types, functions and tests are English.
 - Read `README.md`, `docs/ROADMAP.md`, `docs/ARCHITECTURE.md` and `docs/CURSOR_CONTRACT.md` before substantial work.
