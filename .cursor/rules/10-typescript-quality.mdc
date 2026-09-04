@@ -1,0 +1,20 @@
+---
+description: TypeScript quality and architecture rules
+globs: src/**/*.ts,src/**/*.tsx
+alwaysApply: false
+---
+
+# TypeScript rules
+
+- TypeScript strict mode must stay enabled.
+- No `any` unless explicitly justified in a comment and review.
+- Do not use `@ts-ignore` to hide design/type errors.
+- Prefer discriminated unions for domain states/actions.
+- Prefer small pure functions for domain/math code.
+- React components must not contain poker formulas.
+- No duplicated domain constants.
+- No floating-point representation for chip amounts; chips are integers.
+- Validate data at domain boundaries.
+- Errors shown to the user must be understandable Russian text.
+- Do not swallow exceptions with empty catch blocks.
+- Dependencies require a short justification and should be hidden behind our own adapter when they implement core poker logic.

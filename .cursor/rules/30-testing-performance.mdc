@@ -1,0 +1,28 @@
+---
+description: Testing and performance requirements
+globs: src/domain/**,src/engine/**,src/workers/**,tests/**,benchmarks/**
+alwaysApply: false
+---
+
+# Testing and performance
+
+For any poker math/domain change:
+- add/update unit tests;
+- include edge cases;
+- include at least one regression test for each fixed bug.
+
+Required categories as applicable:
+- golden scenario tests;
+- invariants;
+- blockers/card uniqueness;
+- betting legality;
+- split pots/ties;
+- seeded equity tests.
+
+Never change expected values only to make tests pass without explaining why the old expectation was wrong.
+
+Heavy equity calculations must not block the browser main thread.
+Worker responses must not race: stale requests cannot overwrite a newer calculation.
+
+Performance changes should report measured before/after values when a benchmark already exists.
+Correctness has priority over micro-optimization.

@@ -1,0 +1,27 @@
+---
+description: Cursor agent workflow and reporting contract
+alwaysApply: true
+---
+
+# Agent workflow
+
+Follow `docs/CURSOR_CONTRACT.md`.
+
+Before substantial edits:
+- inspect git status;
+- inspect relevant code and docs;
+- define scope and DoD;
+- use Plan Mode for architectural or multi-file tasks.
+
+After implementation:
+- run lint;
+- run typecheck;
+- run tests;
+- run build;
+- run domain/benchmark checks when relevant.
+
+Do not merge main.
+Do not force push.
+Do not implement the next roadmap version without an explicit request.
+
+Finish every task using the exact report sections defined in `docs/CURSOR_CONTRACT.md`.

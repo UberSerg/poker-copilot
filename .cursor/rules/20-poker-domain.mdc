@@ -1,0 +1,22 @@
+---
+description: Poker domain correctness rules
+globs: src/domain/**,src/engine/**,src/workers/**
+alwaysApply: false
+---
+
+# Poker domain rules
+
+- Variant: 6-max NLHE cash until roadmap explicitly expands it.
+- Never allow duplicate physical cards across hole cards, board and explicit villain cards.
+- Betting actions must be validated against current PokerState.
+- Pot, contributions, to-call and stacks must derive from action history/state, not UI labels.
+- Track street explicitly.
+- Track folded/all-in/active states explicitly.
+- Define effective stack from players actually participating in the relevant decision.
+- Keep pot odds, SPR, equity and required equity as separate concepts.
+- Equity alone is not a complete decision policy.
+- A raise recommendation requires its own rationale; do not infer it merely from equity > required equity.
+- Range blockers must remove impossible combos.
+- Exact enumeration and Monte Carlo results must identify which mode produced them.
+- Monte Carlo tests must be reproducible via seeded RNG.
+- If a third-party hand evaluator is used, wrap it behind `HandEvaluator` and verify it with golden tests.

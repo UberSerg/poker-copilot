@@ -1,0 +1,72 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+}
+
+.app-subtitle {
+  margin: 0.35rem 0 0;
+  color: #4a5540;
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-areas:
+    'table actions'
+    'metrics recommendation';
+  gap: 1rem;
+}
+
+.panel {
+  min-height: 10rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid #c7d0bc;
+  background: #f7f9f3;
+}
+
+.panel h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.panel-placeholder {
+  margin: 0;
+  color: #5c6754;
+}
+
+.panel-table {
+  grid-area: table;
+}
+
+.panel-actions {
+  grid-area: actions;
+}
+
+.panel-metrics {
+  grid-area: metrics;
+}
+
+.panel-recommendation {
+  grid-area: recommendation;
+}
+
+@media (max-width: 900px) {
+  .app-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'table'
+      'actions'
+      'metrics'
+      'recommendation';
+  }
+}

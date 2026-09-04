@@ -1,0 +1,23 @@
+---
+description: Russian UI and interaction rules
+globs: src/ui/**,src/app/**,src/**/*.tsx,src/i18n/**
+alwaysApply: false
+---
+
+# UI rules
+
+- All visible product UI is Russian.
+- Do not expose English enum names directly to users.
+- Keep user-facing strings centralized in the i18n layer where practical.
+- Optimize for very fast manual hand entry.
+- Important actions must work by click/tap, not hover only.
+- Invalid actions should be disabled or rejected with a concise Russian explanation.
+- Recommendation panel must separate:
+  - действие;
+  - размер;
+  - ключевые метрики;
+  - почему;
+  - предупреждения.
+- Always make it visible which Villain range/profile is currently used.
+- Avoid visual clutter; poker table is primary, recommendation is secondary but prominent.
+- Do not add decorative UI that slows manual hand entry.

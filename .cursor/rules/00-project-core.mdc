@@ -1,0 +1,21 @@
+---
+description: Core project rules for Poker Copilot
+alwaysApply: true
+---
+
+# Poker Copilot core rules
+
+- Project is a local training/simulation Texas Hold'em calculator.
+- Do not add screen capture, OCR, auto-clicking, anti-detection, or real poker-room integration.
+- Current product scope is 6-max No-Limit Texas Hold'em cash.
+- UI language is Russian.
+- Code identifiers, filenames, types, functions and tests are English.
+- Read `README.md`, `docs/ROADMAP.md`, `docs/ARCHITECTURE.md` and `docs/CURSOR_CONTRACT.md` before substantial work.
+- Work only on the requested roadmap stage.
+- Do not implement future roadmap stages "while here".
+- Poker math and strategy must not be implemented inside React components.
+- `PokerState` is the source of truth for a hand.
+- Prefer pure functions and immutable domain transformations.
+- Do not claim GTO/optimal/solver quality unless a separately verified solver layer exists.
+- If required input is missing, expose uncertainty or "Недостаточно данных" rather than inventing facts.
+- Never commit secrets, access tokens, credentials or local environment files.
