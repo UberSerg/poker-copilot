@@ -262,6 +262,18 @@ DoD:
 
 ---
 
+## Decision Intelligence Layer — COMPLETE ✅
+
+Расширение V0.7:
+- Board texture / Hand context / Position / Bet context
+- Explanation sections (Математика + Контекст)
+- Confidence V2
+- Decision audit trail (DEV)
+
+Ещё не сделано: GTO, solver, preflop charts, exploit.
+
+---
+
 ## V0.8 — Preflop Strategy
 
 Цель: качественный preflop, где Monte Carlo сам по себе недостаточен.

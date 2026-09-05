@@ -16,11 +16,14 @@
 - Exact / Random / Range opponent
 - Range Engine (parser, weights, blockers, 13×13 matrix)
 - Decision Engine V1 (rule-based postflop assistant — **не GTO**)
+- Decision Intelligence: board texture, hand context, explanation sections, audit
 
 ## Текущий scope
 - Режим: **Cash** (6-max NLHE).
 - SNG / MTT — только архитектурный задел (см. `docs/GAME_MODES.md`).
 - GTO / solver / preflop charts / outs — **ещё не реализованы**.
+
+> Следующий крупный этап (preflop charts) — только после архитектурного ревью.
 
 ## Принципы
 - Только локальный учебный/симуляционный сценарий.

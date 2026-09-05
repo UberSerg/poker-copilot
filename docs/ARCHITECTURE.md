@@ -109,6 +109,26 @@ DecisionResult → RecommendationPanel
 - No bet: check или осторожный value bet baseline.
 - Sizing проверяется через `validateAction`.
 
+## Analysis Layer (Decision Intelligence)
+
+```text
+BoardTextureAnalyzer
+HandContextAnalyzer
+PositionContextAnalyzer
+BetContextAnalyzer
+        |
+        v
+DecisionContext (+ equity/range)
+        |
+        v
+DecisionEngine → ExplanationSections + DecisionAudit
+```
+
+- Классификация текстуры борда (DRY/SEMI_WET/WET) — не GTO.
+- Hand context: top/overpair, draws (без полного outs engine).
+- Confidence V2 учитывает opponent model, street, strength.
+- DEV: audit trail «Показать анализ».
+
 ## Betting core hardening
 
 ### Betting round completion
