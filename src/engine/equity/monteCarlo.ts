@@ -1,5 +1,6 @@
 import type { Card } from '../../domain/cards/Card'
 import { compareHoleBoards } from '../hand-evaluator/pokerToolsStrength'
+import { buildRangeDistribution, sampleWeightedCombo } from '../ranges/sampler'
 import { remainingDeck } from './deckUtils'
 import { createSeededRandom, sampleWithoutReplacement, type Rng } from './rng'
 import type { EquityInput, EquityOutcome } from './types'
@@ -47,15 +48,46 @@ export function calculateMonteCarlo(
   const baseRemaining = remainingDeck(baseDead)
   const missingBoard = 5 - input.board.length
 
+  if (input.opponentMode === 'RANGE') {
+    const combos = (input.rangeCombos ?? []).filter((c) => c.weight > 0)
+    if (combos.length === 0) {
+      return {
+        ok: false,
+        error: {
+          code: 'RANGE_EMPTY_AFTER_BLOCKERS',
+          message: 'Range has no legal combos after blockers',
+        },
+      }
+    }
+    const distribution = buildRangeDistribution(combos)
+    let wins = 0
+    let ties = 0
+    let losses = 0
+
+    for (let i = 0; i < iterations; i += 1) {
+      const picked = sampleWeightedCombo(distribution, rng)
+      const afterOpp = baseRemaining.filter(
+        (card) => card !== picked.cards[0] && card !== picked.cards[1],
+      )
+      const boardExtra =
+        missingBoard === 0 ? [] : sampleWithoutReplacement(afterOpp, missingBoard, rng)
+      const board = [...input.board, ...boardExtra]
+      const cmp = compareHoleBoards(input.heroCards, picked.cards, board)
+      if (cmp > 0) wins += 1
+      else if (cmp < 0) losses += 1
+      else ties += 1
+    }
+
+    return { ok: true, result: finalize(wins, ties, losses, iterations, started) }
+  }
+
   let wins = 0
   let ties = 0
   let losses = 0
 
   for (let i = 0; i < iterations; i += 1) {
-    const need =
-      input.opponentMode === 'EXACT' ? missingBoard : 2 + missingBoard
-    const sampled =
-      need === 0 ? [] : sampleWithoutReplacement(baseRemaining, need, rng)
+    const need = input.opponentMode === 'EXACT' ? missingBoard : 2 + missingBoard
+    const sampled = need === 0 ? [] : sampleWithoutReplacement(baseRemaining, need, rng)
 
     let opponent: readonly Card[]
     let boardExtra: Card[]

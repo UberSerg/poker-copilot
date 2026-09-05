@@ -23,6 +23,15 @@ export function validateEquityInput(input: EquityInput): EquityError | null {
     }
   }
 
+  if (input.opponentMode === 'RANGE') {
+    if (!input.rangeCombos || input.rangeCombos.length === 0) {
+      return {
+        code: 'RANGE_EMPTY_AFTER_BLOCKERS',
+        message: 'Range has no legal combos after blockers',
+      }
+    }
+  }
+
   const all: Card[] = [...input.heroCards, ...input.board]
   if (input.opponentMode === 'EXACT' && input.opponentCards) {
     all.push(...input.opponentCards)
@@ -33,6 +42,17 @@ export function validateEquityInput(input: EquityInput): EquityError | null {
       return { code: 'DUPLICATE_CARD', message: 'Duplicate card in equity input' }
     }
     seen.add(card)
+  }
+
+  if (input.opponentMode === 'RANGE' && input.rangeCombos) {
+    for (const combo of input.rangeCombos) {
+      if (combo.cards[0] === combo.cards[1]) {
+        return { code: 'DUPLICATE_CARD', message: 'Duplicate card in range combo' }
+      }
+      if (seen.has(combo.cards[0]) || seen.has(combo.cards[1])) {
+        return { code: 'DUPLICATE_CARD', message: 'Range combo intersects known cards' }
+      }
+    }
   }
 
   return null
