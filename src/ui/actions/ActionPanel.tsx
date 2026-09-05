@@ -7,6 +7,7 @@ import { POSITIONS_6MAX } from '../../domain/game/Position'
 import { chipsToBb } from '../../domain/math/chips'
 import { bbToChips } from '../../domain/math/chips'
 import { ru } from '../../i18n/ru'
+import { actionButtonStyle, type ActionButtonArt } from '../theme/spriteMap'
 import './ActionPanel.css'
 
 interface ActionPanelProps {
@@ -17,6 +18,37 @@ interface ActionPanelProps {
   onNextStreet: () => void
   canUndo: boolean
   canAdvance: boolean
+}
+
+function SpriteActionButton({
+  art,
+  label,
+  disabled,
+  onClick,
+  hint,
+}: {
+  art: ActionButtonArt
+  label: string
+  disabled?: boolean
+  onClick: () => void
+  hint?: string
+}) {
+  return (
+    <div className="sprite-btn-wrap">
+      <button
+        type="button"
+        className="sprite-btn sprite-btn--action"
+        style={actionButtonStyle(art)}
+        disabled={disabled}
+        onClick={onClick}
+        aria-label={label}
+        title={label}
+      >
+        <span className="sprite-btn__label">{label}</span>
+      </button>
+      {hint ? <span className="sprite-btn-hint">{hint}</span> : null}
+    </div>
+  )
 }
 
 export function ActionPanel({
@@ -54,10 +86,6 @@ export function ActionPanel({
       setSizeBb(String(chipsToBb(Math.min(amount, legal.maxBetOrRaiseTo), state.bigBlind)))
       return
     }
-    // raise-to = current committed of actor is 0 postflop typically; raise-to = currentBet + size? 
-    // Quick sizes for raise: treat as raise-to = current street contribution target ≈ potFraction of pot added on top of call,
-    // Spec: quick sizes calculate input amount. For raise panel the input is raise-to.
-    // Use: raiseTo = currentBet + pot*fraction, clamped.
     const raiseTo = Math.min(
       Math.max(state.minimumRaiseTo, state.currentBet + amount),
       legal.maxBetOrRaiseTo,
@@ -65,9 +93,15 @@ export function ActionPanel({
     setSizeBb(String(chipsToBb(raiseTo, state.bigBlind)))
   }
 
+  const callHint = legal.call
+    ? `${chipsToBb(legal.amountToCall, state.bigBlind)} ${ru.labels.bb}`
+    : undefined
+
   return (
-    <section className="action-panel" aria-labelledby="actions-title">
-      <h2 id="actions-title">{ru.panels.actions}</h2>
+    <section className="action-panel analysis-panel" aria-labelledby="actions-title">
+      <h2 id="actions-title" className="analysis-panel__title">
+        {ru.panels.actions}
+      </h2>
 
       <label className="actor-select">
         Игрок
@@ -85,36 +119,43 @@ export function ActionPanel({
       </label>
 
       <div className="action-buttons">
-        <button type="button" disabled={!legal.fold} onClick={() => onAction({ type: 'FOLD', position })}>
-          {ru.buttons.fold}
-        </button>
-        <button type="button" disabled={!legal.check} onClick={() => onAction({ type: 'CHECK', position })}>
-          {ru.buttons.check}
-        </button>
-        <button type="button" disabled={!legal.call} onClick={() => onAction({ type: 'CALL', position })}>
-          {ru.buttons.call}
-          {legal.call ? ` ${chipsToBb(legal.amountToCall, state.bigBlind)} ${ru.labels.bb}` : ''}
-        </button>
-        <button
-          type="button"
+        <SpriteActionButton
+          art="fold"
+          label={ru.buttons.fold}
+          disabled={!legal.fold}
+          onClick={() => onAction({ type: 'FOLD', position })}
+        />
+        <SpriteActionButton
+          art="check"
+          label={ru.buttons.check}
+          disabled={!legal.check}
+          onClick={() => onAction({ type: 'CHECK', position })}
+        />
+        <SpriteActionButton
+          art="call"
+          label={ru.buttons.call}
+          disabled={!legal.call}
+          onClick={() => onAction({ type: 'CALL', position })}
+          hint={callHint}
+        />
+        <SpriteActionButton
+          art="bet"
+          label={ru.buttons.bet}
           disabled={!legal.bet || sizeChips === null}
           onClick={() => {
             if (sizeChips === null) return
             onAction({ type: 'BET', position, amountChips: sizeChips })
           }}
-        >
-          {ru.buttons.bet}
-        </button>
-        <button
-          type="button"
+        />
+        <SpriteActionButton
+          art="raise"
+          label={ru.buttons.raise}
           disabled={!legal.raise || sizeChips === null}
           onClick={() => {
             if (sizeChips === null) return
             onAction({ type: 'RAISE', position, raiseToChips: sizeChips })
           }}
-        >
-          {ru.buttons.raise}
-        </button>
+        />
       </div>
 
       <label className="size-input">
@@ -123,36 +164,40 @@ export function ActionPanel({
       </label>
 
       <div className="quick-sizes">
-        <button type="button" onClick={() => applyQuick(1 / 3)}>
+        <button type="button" className="chip-btn" onClick={() => applyQuick(1 / 3)}>
           {ru.quickSizes.third}
         </button>
-        <button type="button" onClick={() => applyQuick(1 / 2)}>
+        <button type="button" className="chip-btn" onClick={() => applyQuick(1 / 2)}>
           {ru.quickSizes.half}
         </button>
-        <button type="button" onClick={() => applyQuick(2 / 3)}>
+        <button type="button" className="chip-btn" onClick={() => applyQuick(2 / 3)}>
           {ru.quickSizes.twoThirds}
         </button>
-        <button type="button" onClick={() => applyQuick(3 / 4)}>
+        <button type="button" className="chip-btn" onClick={() => applyQuick(3 / 4)}>
           {ru.quickSizes.threeQuarters}
         </button>
-        <button type="button" onClick={() => applyQuick(1)}>
+        <button type="button" className="chip-btn" onClick={() => applyQuick(1)}>
           {ru.quickSizes.pot}
         </button>
-        <button type="button" onClick={() => applyQuick('allin')}>
+        <button type="button" className="chip-btn" onClick={() => applyQuick('allin')}>
           {ru.quickSizes.allIn}
         </button>
       </div>
 
       <div className="utility-buttons">
-        <button type="button" onClick={onNewHand}>
-          {ru.buttons.newHand}
-        </button>
-        <button type="button" disabled={!canUndo} onClick={onUndo}>
-          {ru.buttons.undo}
-        </button>
-        <button type="button" disabled={!canAdvance} onClick={onNextStreet}>
-          {ru.buttons.nextStreet}
-        </button>
+        <SpriteActionButton art="newHand" label={ru.buttons.newHand} onClick={onNewHand} />
+        <SpriteActionButton
+          art="undo"
+          label={ru.buttons.undo}
+          disabled={!canUndo}
+          onClick={onUndo}
+        />
+        <SpriteActionButton
+          art="nextStreet"
+          label={ru.buttons.nextStreet}
+          disabled={!canAdvance}
+          onClick={onNextStreet}
+        />
       </div>
     </section>
   )

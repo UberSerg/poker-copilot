@@ -1,6 +1,9 @@
 :root {
-  color: #1a1f16;
-  background: linear-gradient(180deg, #e7eee2 0%, #d7e1d2 100%);
+  color: var(--poker-text, #e8eef8);
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(31, 107, 58, 0.18), transparent 45%),
+    radial-gradient(ellipse at 90% 10%, rgba(212, 168, 75, 0.08), transparent 40%),
+    linear-gradient(180deg, #0b1220 0%, #0a101c 55%, #080e18 100%);
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-synthesis: none;
   font-weight: 400;
@@ -18,6 +21,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: transparent;
 }
 
 #root {

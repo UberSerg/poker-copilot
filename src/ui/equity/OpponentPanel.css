@@ -1,10 +1,7 @@
-.opponent-panel h2,
 .opponent-panel h3 {
   margin: 0 0 0.45rem;
-}
-
-.opponent-panel h3 {
   font-size: 0.95rem;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .opponent-mode {
@@ -32,12 +29,12 @@
 .showdown-block p {
   margin: 0.2rem 0;
   font-size: 0.9rem;
-  color: #4f5d4a;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .showdown-result {
   font-weight: 700 !important;
-  color: #1d271c !important;
+  color: var(--poker-text, #e8eef8) !important;
   margin-top: 0.45rem !important;
 }
 
@@ -45,5 +42,5 @@
 .showdown-block {
   margin-top: 0.65rem;
   padding-top: 0.45rem;
-  border-top: 1px solid #d5dec8;
+  border-top: 1px solid rgba(42, 58, 92, 0.7);
 }

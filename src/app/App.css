@@ -2,7 +2,7 @@
   max-width: 1440px;
   margin: 0 auto;
   padding: 1rem 1.25rem 2rem;
-  color: #1d271c;
+  color: var(--poker-text, #e8eef8);
 }
 
 .app-header {
@@ -16,17 +16,20 @@
 .app-header h1 {
   margin: 0;
   font-size: 1.8rem;
+  color: var(--poker-gold-bright, #f0c868);
+  letter-spacing: 0.02em;
 }
 
 .app-subtitle {
   margin: 0.25rem 0 0;
-  color: #556350;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .mode-badge {
-  border: 1px solid #b7c5b0;
-  background: #eef3ea;
-  border-radius: 0.4rem;
+  border: 1px solid rgba(212, 168, 75, 0.4);
+  background: rgba(18, 26, 43, 0.9);
+  color: var(--poker-gold-bright, #f0c868);
+  border-radius: var(--poker-radius-md, 0.55rem);
   padding: 0.45rem 0.7rem;
   white-space: nowrap;
 }
@@ -34,9 +37,10 @@
 .app-error {
   margin-bottom: 0.75rem;
   padding: 0.55rem 0.75rem;
-  background: #fdecea;
-  border: 1px solid #e2a8a2;
-  color: #8a1f14;
+  background: rgba(196, 92, 92, 0.15);
+  border: 1px solid rgba(196, 92, 92, 0.45);
+  color: #e8a0a0;
+  border-radius: var(--poker-radius-md, 0.55rem);
 }
 
 .app-layout {
@@ -59,34 +63,57 @@
 
 .app-sidebar > section,
 .recommendation-panel,
-.debug-panel {
-  background: #f7faf4;
-  border: 1px solid #cfd9c8;
-  border-radius: 0.5rem;
+.debug-panel,
+.equity-panel,
+.opponent-panel,
+.metrics-panel,
+.range-editor,
+.action-timeline {
+  background: linear-gradient(160deg, rgba(18, 26, 43, 0.92), rgba(11, 18, 32, 0.96));
+  border: 1px solid var(--poker-steel-border, #2a3a5c);
+  border-radius: var(--poker-radius-lg, 0.85rem);
+  box-shadow: var(--poker-shadow-panel, 0 8px 28px rgba(0, 0, 0, 0.35));
   padding: 0.75rem 0.85rem;
+  color: var(--poker-text, #e8eef8);
 }
 
-.recommendation-panel h2 {
+.app-sidebar > section h2,
+.recommendation-panel h2,
+.equity-panel h2,
+.opponent-panel h2,
+.metrics-panel h2,
+.range-editor h2,
+.action-timeline h2,
+.debug-panel h2 {
   margin: 0 0 0.4rem;
   font-size: 1.05rem;
+  color: var(--poker-gold-bright, #f0c868);
 }
 
 .recommendation-panel p {
   margin: 0;
-  color: #5d6a58;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .debug-panel pre {
   max-height: 240px;
   overflow: auto;
   font-size: 0.7rem;
-  background: #111;
+  background: #080e18;
   color: #d6f5d0;
   padding: 0.5rem;
+  border-radius: var(--poker-radius-sm, 0.35rem);
+  border: 1px solid var(--poker-steel-border, #2a3a5c);
 }
 
 .debug-panel button {
   margin-bottom: 0.4rem;
+  border: 1px solid var(--poker-steel-border, #2a3a5c);
+  background: rgba(28, 39, 64, 0.85);
+  color: var(--poker-text, #e8eef8);
+  border-radius: var(--poker-radius-sm, 0.35rem);
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
 }
 
 @media (max-width: 1100px) {

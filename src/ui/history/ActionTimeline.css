@@ -1,18 +1,14 @@
-.action-timeline h2 {
-  margin: 0 0 0.5rem;
-  font-size: 1.05rem;
-}
-
-.timeline-street h3 {
+.action-timeline h3 {
   margin: 0.5rem 0 0.25rem;
   font-size: 0.9rem;
-  color: #4f5d4a;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .action-timeline ul {
   margin: 0;
   padding-left: 1rem;
   font-size: 0.85rem;
+  color: var(--poker-text, #e8eef8);
 }
 
 .action-timeline li {

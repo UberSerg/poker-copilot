@@ -15,36 +15,62 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.85rem;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .actor-select select,
 .size-input input {
-  border: 1px solid #c5d0bc;
-  border-radius: 0.3rem;
+  border: 1px solid var(--poker-steel-border, #2a3a5c);
+  border-radius: var(--poker-radius-sm, 0.35rem);
   padding: 0.35rem 0.45rem;
-  background: #fff;
+  background: rgba(11, 18, 32, 0.9);
+  color: var(--poker-text, #e8eef8);
 }
 
 .action-buttons,
-.quick-sizes,
 .utility-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: flex-start;
+}
+
+.quick-sizes {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
 }
 
-.action-buttons button,
-.quick-sizes button,
-.utility-buttons button {
-  border: 1px solid #7d8f76;
-  background: #eef3e8;
-  border-radius: 0.3rem;
-  padding: 0.35rem 0.55rem;
-  cursor: pointer;
+.sprite-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
 }
 
-.action-buttons button:disabled,
-.utility-buttons button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.sprite-btn--action {
+  width: 5.6rem;
+  height: 2.35rem;
+  background-color: transparent;
+}
+
+.sprite-btn-hint {
+  font-size: 0.72rem;
+  color: var(--poker-gold-bright, #f0c868);
+  font-weight: 600;
+}
+
+.chip-btn {
+  border: 1px solid var(--poker-steel-border, #2a3a5c);
+  background: rgba(28, 39, 64, 0.85);
+  color: var(--poker-text, #e8eef8);
+  border-radius: var(--poker-radius-sm, 0.35rem);
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+  transition: border-color 0.12s ease, filter 0.12s ease;
+}
+
+.chip-btn:hover {
+  border-color: var(--poker-gold, #d4a84b);
+  filter: brightness(1.08);
 }

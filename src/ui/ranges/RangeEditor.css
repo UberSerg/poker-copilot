@@ -1,5 +1,5 @@
 .range-editor {
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .range-editor__text {
@@ -8,10 +8,10 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.85rem;
   padding: 0.5rem 0.65rem;
-  border-radius: 6px;
-  border: 1px solid #2f3844;
-  background: #12161c;
-  color: #e8edf2;
+  border-radius: var(--poker-radius-sm, 0.35rem);
+  border: 1px solid var(--poker-steel-border, #2a3a5c);
+  background: rgba(11, 18, 32, 0.9);
+  color: var(--poker-text, #e8eef8);
   resize: vertical;
 }
 
@@ -32,17 +32,17 @@
 
 .range-editor__actions button,
 .range-editor__weights button {
-  border: 1px solid #3a4552;
-  background: #1c232c;
-  color: #d7dee6;
-  border-radius: 4px;
+  border: 1px solid var(--poker-steel-border, #2a3a5c);
+  background: rgba(28, 39, 64, 0.85);
+  color: var(--poker-text, #e8eef8);
+  border-radius: var(--poker-radius-sm, 0.35rem);
   padding: 0.25rem 0.55rem;
   cursor: pointer;
 }
 
 .range-editor__weights button.is-active {
-  border-color: #e8c36a;
-  color: #e8c36a;
+  border-color: var(--poker-gold, #e8c36a);
+  color: var(--poker-gold-bright, #e8c36a);
 }
 
 .range-editor__weights button:disabled {
@@ -63,7 +63,7 @@
 
 .range-editor__stats dt {
   font-size: 0.75rem;
-  color: #9aa3ad;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .range-editor__stats dd {

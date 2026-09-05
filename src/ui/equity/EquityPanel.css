@@ -1,20 +1,18 @@
-.equity-panel h2 {
-  margin: 0 0 0.55rem;
-  font-size: 1.05rem;
-}
-
 .equity-precision {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.85rem;
   margin-bottom: 0.55rem;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .equity-precision select {
-  border: 1px solid #c5d0bc;
-  border-radius: 0.3rem;
+  border: 1px solid var(--poker-steel-border, #2a3a5c);
+  border-radius: var(--poker-radius-sm, 0.35rem);
   padding: 0.3rem 0.4rem;
+  background: rgba(11, 18, 32, 0.9);
+  color: var(--poker-text, #e8eef8);
 }
 
 .equity-stats {
@@ -27,12 +25,12 @@
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  border-bottom: 1px solid #d5dec8;
+  border-bottom: 1px solid rgba(42, 58, 92, 0.7);
   padding-bottom: 0.25rem;
 }
 
 .equity-stats dt {
-  color: #5b6756;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .equity-stats dd {
@@ -46,10 +44,11 @@
 .equity-error {
   margin: 0.4rem 0 0;
   font-size: 0.9rem;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .equity-error {
-  color: #8a1f14;
+  color: #e8a0a0;
 }
 
 .equity-loading {
@@ -61,8 +60,8 @@
 .equity-spinner {
   width: 0.85rem;
   height: 0.85rem;
-  border: 2px solid #b7c5b0;
-  border-top-color: #2f6b3a;
+  border: 2px solid var(--poker-steel-border, #2a3a5c);
+  border-top-color: var(--poker-gold, #d4a84b);
   border-radius: 50%;
   animation: equity-spin 0.7s linear infinite;
 }
@@ -86,7 +85,7 @@
 
 .equity-range-context dt {
   font-size: 0.75rem;
-  color: #9aa3ad;
+  color: var(--poker-text-muted, #9aa8c0);
 }
 
 .equity-range-context dd {
