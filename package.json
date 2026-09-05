@@ -9,10 +9,12 @@
     "lint": "eslint .",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
+    "benchmark": "tsx benchmarks/equityBenchmark.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@pokertools/evaluator": "^1.0.9",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
@@ -30,6 +32,7 @@
     "globals": "^16.5.0",
     "jsdom": "^27.0.1",
     "prettier": "^3.6.2",
+    "tsx": "^4.23.13",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^8.2.2",

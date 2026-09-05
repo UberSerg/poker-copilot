@@ -58,6 +58,8 @@ DoD:
 
 ## V0.1 — Cards & Table UI ✅
 
+**V0.1 Hand Builder Core — COMPLETE**
+
 Цель: вручную собрать визуальное состояние стола.
 
 Сделать:
@@ -122,7 +124,7 @@ DoD:
 - Golden tests для preflop raise/call, 3-bet pot, postflop bet/call, all-in.
 - Ни одного вычисления pot odds в UI.
 
-### Betting Core Hardening — complete ✅
+### Betting Core Hardening — COMPLETE ✅
 
 Ужесточение перед Hand Evaluator / Equity:
 
@@ -134,7 +136,9 @@ DoD:
 
 ---
 
-## V0.4 — Hand Evaluator
+## V0.4 — Hand Evaluator ✅
+
+**Hand Evaluator — COMPLETE**
 
 Цель: точно определять комбинацию Hero и сравнивать конкретные руки.
 
@@ -156,14 +160,16 @@ DoD:
 
 ---
 
-## V0.5 — Equity Engine V1
+## V0.5 — Equity Engine V1 ✅
+
+**Equity Engine V1 — COMPLETE**
 
 Цель: быстро считать шансы Hero.
 
 Режимы:
-1. Hero vs exact hand.
-2. Hero vs random hand.
-3. Hero vs explicit range.
+1. Hero vs exact hand. ✅
+2. Hero vs random hand. ✅
+3. Hero vs explicit range. → deferred to V0.6
 
 Архитектура:
 - Exact enumeration когда пространство достаточно маленькое.
@@ -171,7 +177,7 @@ DoD:
 - Расчёты в Web Worker.
 - Cancellation предыдущего расчёта при изменении входа.
 - Seedable RNG для воспроизводимых тестов.
-- Progressive result: быстрый приблизительный -> уточнённый.
+- Progressive result: опционально; V1 допускает один расчёт на выбранный preset.
 
 Результат:
 - win %

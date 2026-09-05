@@ -103,6 +103,7 @@ export function createInitialState(options?: {
     heroPosition,
     players,
     heroCards: [null, null],
+    opponentCards: [null, null],
     board: [null, null, null, null, null],
     street: 'PREFLOP',
     pot,

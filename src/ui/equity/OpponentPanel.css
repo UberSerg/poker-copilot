@@ -1,0 +1,49 @@
+.opponent-panel h2,
+.opponent-panel h3 {
+  margin: 0 0 0.45rem;
+}
+
+.opponent-panel h3 {
+  font-size: 0.95rem;
+}
+
+.opponent-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.9rem;
+}
+
+.opponent-mode label {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.opponent-cards {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.opponent-random-hint,
+.combo-block p,
+.showdown-block p {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+  color: #4f5d4a;
+}
+
+.showdown-result {
+  font-weight: 700 !important;
+  color: #1d271c !important;
+  margin-top: 0.45rem !important;
+}
+
+.combo-block,
+.showdown-block {
+  margin-top: 0.65rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid #d5dec8;
+}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   advanceStreet,
   applyAction,
@@ -9,24 +9,43 @@ import {
   setBoardCard,
   setHeroCard,
   setHeroPosition,
+  setOpponentCard,
   setPlayerStartingStackBb,
 } from '../domain/game'
+import {
+  buildEquityInput,
+  formatHeroComboRu,
+  getHeroEvaluatedHand,
+  getOpponentEvaluatedHand,
+  getShowdownResult,
+} from '../domain/game/equitySelectors'
 import type { Card } from '../domain/cards/Card'
 import type { PokerAction } from '../domain/game/PokerAction'
 import type { PokerState } from '../domain/game/PokerState'
 import type { Position } from '../domain/game/Position'
 import type { DomainError } from '../domain/game/PokerState'
+import { MC_PRESETS } from '../engine/equity/types'
+import type { OpponentMode } from '../engine/equity/types'
 import { ActionPanel } from '../ui/actions/ActionPanel'
 import { CardPicker } from '../ui/cards/CardPicker'
+import { EquityPanel } from '../ui/equity/EquityPanel'
+import { OpponentPanel } from '../ui/equity/OpponentPanel'
 import { ActionTimeline } from '../ui/history/ActionTimeline'
 import { MetricsPanel } from '../ui/metrics/MetricsPanel'
 import { PokerTable } from '../ui/table/PokerTable'
+import { EquityWorkerClient } from '../workers/EquityWorkerClient'
+import {
+  createInitialEquityUiState,
+  type EquityCalculationState,
+  type PrecisionPreset,
+} from './equityUiState'
 import { ru } from '../i18n/ru'
 import './App.css'
 
 type CardSlot =
   | { kind: 'hero'; index: 0 | 1 }
   | { kind: 'board'; index: 0 | 1 | 2 | 3 | 4 }
+  | { kind: 'opp'; index: 0 | 1 }
 
 function translateError(error: DomainError): string {
   return ru.errors[error.code] ?? error.message
@@ -38,9 +57,90 @@ export function App() {
   const [slot, setSlot] = useState<CardSlot | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showJson, setShowJson] = useState(false)
+  const [equityUi, setEquityUi] = useState<EquityCalculationState>(() => createInitialEquityUiState())
+  const workerRef = useRef<EquityWorkerClient | null>(null)
 
   const metrics = useMemo(() => getHandMetrics(state), [state])
   const used = useMemo(() => getUsedCards(state), [state])
+  const heroHand = useMemo(() => getHeroEvaluatedHand(state), [state])
+  const opponentHand = useMemo(() => getOpponentEvaluatedHand(state), [state])
+  const showdown = useMemo(() => getShowdownResult(state), [state])
+  const heroComboLabel = useMemo(() => formatHeroComboRu(state), [state])
+
+  useEffect(() => {
+    workerRef.current = new EquityWorkerClient()
+    return () => {
+      workerRef.current?.terminate()
+      workerRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    const iterations = MC_PRESETS[equityUi.precision]
+    const built = buildEquityInput(state, equityUi.opponentMode, iterations)
+    if (!built.ok) {
+      return
+    }
+
+    let cancelled = false
+    const timer = window.setTimeout(() => {
+      const client = workerRef.current
+      if (!client || cancelled) return
+
+      setEquityUi((prev) => ({
+        ...prev,
+        status: 'CALCULATING',
+        errorMessage: null,
+      }))
+
+      void client.calculate(built.input).then((response) => {
+        if (cancelled) return
+        if (!response.ok) {
+          setEquityUi((prev) => ({
+            ...prev,
+            status: 'ERROR',
+            errorMessage: response.message || ru.equity.calcFailed,
+            result: null,
+          }))
+          return
+        }
+        const outcome = response.outcome
+        if (!outcome.ok) {
+          setEquityUi((prev) => ({
+            ...prev,
+            status: 'ERROR',
+            errorMessage: ru.equity.calcFailed,
+            result: null,
+          }))
+          return
+        }
+        setEquityUi((prev) => ({
+          ...prev,
+          status: 'SUCCESS',
+          result: outcome.result,
+          errorMessage: null,
+          requestId: response.requestId,
+        }))
+      })
+    }, 80)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [state, equityUi.opponentMode, equityUi.precision])
+
+  const equityBlockedReason = useMemo(() => {
+    const built = buildEquityInput(state, equityUi.opponentMode, MC_PRESETS[equityUi.precision])
+    return built.ok ? null : built.reason
+  }, [state, equityUi.opponentMode, equityUi.precision])
+
+  const equityStatus =
+    equityBlockedReason !== null
+      ? ('IDLE' as const)
+      : equityUi.status
+  const equityResult = equityBlockedReason !== null ? null : equityUi.result
+  const equityError = equityBlockedReason !== null ? null : equityUi.errorMessage
 
   function pushState(next: PokerState) {
     setHistory((prev) => [...prev, state])
@@ -86,14 +186,16 @@ export function App() {
     pushState(result.state)
   }
 
+  function applyCardEdit(card: Card | null) {
+    if (!slot) return null
+    if (slot.kind === 'hero') return setHeroCard(state, slot.index, card)
+    if (slot.kind === 'opp') return setOpponentCard(state, slot.index, card)
+    return setBoardCard(state, slot.index, card)
+  }
+
   function handlePick(card: Card) {
-    if (!slot) {
-      return
-    }
-    const result =
-      slot.kind === 'hero'
-        ? setHeroCard(state, slot.index, card)
-        : setBoardCard(state, slot.index, card)
+    const result = applyCardEdit(card)
+    if (!result) return
     if (!result.ok) {
       setError(translateError(result.error))
       return
@@ -103,13 +205,8 @@ export function App() {
   }
 
   function handleClearCard() {
-    if (!slot) {
-      return
-    }
-    const result =
-      slot.kind === 'hero'
-        ? setHeroCard(state, slot.index, null)
-        : setBoardCard(state, slot.index, null)
+    const result = applyCardEdit(null)
+    if (!result) return
     if (!result.ok) {
       setError(translateError(result.error))
       return
@@ -120,14 +217,24 @@ export function App() {
 
   function slotHasCard(): boolean {
     if (!slot) return false
-    return slot.kind === 'hero'
-      ? state.heroCards[slot.index] !== null
-      : state.board[slot.index] !== null
+    if (slot.kind === 'hero') return state.heroCards[slot.index] !== null
+    if (slot.kind === 'opp') return state.opponentCards[slot.index] !== null
+    return state.board[slot.index] !== null
   }
 
   function selectedSlotKey(): string | null {
     if (!slot) return null
-    return slot.kind === 'hero' ? `hero-${slot.index}` : `board-${slot.index}`
+    if (slot.kind === 'hero') return `hero-${slot.index}`
+    if (slot.kind === 'opp') return `opp-${slot.index}`
+    return `board-${slot.index}`
+  }
+
+  function handleOpponentMode(mode: OpponentMode) {
+    setEquityUi((prev) => ({ ...prev, opponentMode: mode }))
+  }
+
+  function handlePrecision(precision: PrecisionPreset) {
+    setEquityUi((prev) => ({ ...prev, precision }))
   }
 
   return (
@@ -181,6 +288,25 @@ export function App() {
 
         <aside className="app-sidebar">
           <MetricsPanel metrics={metrics} bigBlind={state.bigBlind} />
+          <EquityPanel
+            status={equityStatus}
+            result={equityResult}
+            errorMessage={equityError}
+            precision={equityUi.precision}
+            onPrecisionChange={handlePrecision}
+            blockedReason={equityBlockedReason}
+          />
+          <OpponentPanel
+            mode={equityUi.opponentMode}
+            cards={state.opponentCards}
+            selectedSlot={selectedSlotKey()}
+            onModeChange={handleOpponentMode}
+            onCardClick={(index) => setSlot({ kind: 'opp', index })}
+            heroHand={heroHand}
+            opponentHand={opponentHand}
+            showdown={showdown}
+            heroComboLabel={heroComboLabel}
+          />
           <ActionPanel
             state={state}
             onAction={handleAction}
