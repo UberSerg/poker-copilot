@@ -81,6 +81,34 @@ AnalysisState
 - Random opponent ≠ poker range; user range ≠ strategy truth.
 - Strategic range presets запрещены на этом этапе.
 
+## Decision Engine V1
+
+```text
+PokerState
++
+AnalysisState
++
+EquityResult
+        |
+        v
+DecisionService (application)
+        |
+        v
+DecisionContext
+        |
+        v
+DecisionEngine (rule-based, sync)
+        |
+        v
+DecisionResult → RecommendationPanel
+```
+
+- DecisionEngine **не** вызывает EquityEngine.
+- Это не GTO / не solver: `modelLabel = RULE_BASED_V1`.
+- Facing bet: fold / call / raise по equity vs pot odds + thresholds.
+- No bet: check или осторожный value bet baseline.
+- Sizing проверяется через `validateAction`.
+
 ## Betting core hardening
 
 ### Betting round completion
