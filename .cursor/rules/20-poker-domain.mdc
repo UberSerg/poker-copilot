@@ -26,3 +26,6 @@ alwaysApply: false
 - Monte Carlo tests must be reproducible via seeded RNG.
 - If a third-party hand evaluator is used, wrap it behind `HandEvaluator` and verify it with golden + parity tests.
 - Analysis/opponent assumptions (range, precision) live outside `PokerState`.
+- Decision Engine is rule-based only: never claim GTO/optimal/Nash/solver quality.
+- DecisionEngine must not call EquityEngine; application layer supplies EquityResult in DecisionContext.
+- Recommended actions must be validated as legal against the betting state machine.

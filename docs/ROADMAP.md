@@ -231,46 +231,34 @@ DoD:
 
 ---
 
-## V0.7 — Decision Engine V1
+## V0.7 — Decision Engine V1 ✅
+
+**Decision Engine V1 baseline — COMPLETE**
 
 Цель: первая честная рекомендация FOLD/CHECK/CALL/BET/RAISE.
 
 Не делать вид, что это GTO.
 
-Input:
-- PokerState.
-- Hero hand.
-- Board.
-- Villain range.
-- Equity.
-- Pot odds.
-- SPR.
-- Street.
-- Position.
-- Stack depth.
-- Action history.
+Сделано (baseline):
+- DecisionContext из PokerState + AnalysisState + EquityResult.
+- Facing bet: FOLD / CALL / RAISE по equity vs required equity.
+- No bet: CHECK или value BET baseline.
+- Confidence LOW/MEDIUM/HIGH.
+- Explanations + warnings (range assumption, не GTO).
+- Legal sizing через betting validator.
 
-Output:
-- primaryAction
-- recommendedSizing
-- alternatives[]
-- confidence
-- reasons[]
-- warnings[]
-- metrics snapshot
-
-Первая версия:
-- deterministic rule-based strategy.
-- Call: сравнение equity с required equity + configurable safety margin.
-- Raise/bet: отдельные правила value/bluff/semi-bluff; не выводить raise только потому, что equity > pot odds.
-- Sizing presets: 25%, 33%, 50%, 66%, 75%, 100% pot и all-in, но legal sizing обязан проверяться state machine.
-- Если данных недостаточно, выдавать `Недостаточно данных`, а не уверенное решение.
+Ещё не сделано (future):
+- GTO / solver / CFR
+- preflop charts
+- bluff frequencies / MDF
+- exploit model
+- advanced strategy trees
 
 DoD:
 - Decision engine — pure function.
 - Каждая рекомендация объяснима.
 - Есть scenario tests.
-- UI показывает предупреждение, что рекомендация зависит от выбранного range.
+- UI показывает предупреждение, что рекомендация зависит от выбранного range / модели.
 
 ---
 

@@ -12,18 +12,15 @@
 - Betting Engine (с hardening)
 - Pot / SPR / Pot Odds
 - Hand Evaluator (best five + RU labels)
-- Exact Equity
-- Monte Carlo Equity
-- Web Worker (с отменой stale requests)
-- Exact opponent / Random opponent
-- Range Engine (parser, weights, blockers)
-- 13×13 Range Matrix
-- Equity vs weighted range
+- Exact Equity / Monte Carlo Equity / Web Worker
+- Exact / Random / Range opponent
+- Range Engine (parser, weights, blockers, 13×13 matrix)
+- Decision Engine V1 (rule-based postflop assistant — **не GTO**)
 
 ## Текущий scope
 - Режим: **Cash** (6-max NLHE).
 - SNG / MTT — только архитектурный задел (см. `docs/GAME_MODES.md`).
-- Decision Engine / outs / GTO / стратегические presets — **ещё не реализованы**.
+- GTO / solver / preflop charts / outs — **ещё не реализованы**.
 
 ## Принципы
 - Только локальный учебный/симуляционный сценарий.

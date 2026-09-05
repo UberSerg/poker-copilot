@@ -91,6 +91,25 @@ export const ru = {
     idleHint: 'Выберите карты Hero, чтобы рассчитать equity.',
     calcFailed: 'Не удалось выполнить расчёт equity.',
   },
+  decision: {
+    disclaimer:
+      'Rule-based модель V1. Это не GTO и не solver — объяснимое приближение.',
+    confidence: 'Уверенность',
+    confidenceHigh: 'Высокая',
+    confidenceMedium: 'Средняя',
+    confidenceLow: 'Низкая',
+    why: 'Почему',
+    metrics: 'Метрики',
+    warnings: 'Предупреждения',
+    required: 'Требуется',
+    actions: {
+      FOLD: 'FOLD',
+      CHECK: 'CHECK',
+      CALL: 'CALL',
+      BET: 'BET',
+      RAISE: 'RAISE',
+    },
+  },
   range: {
     title: 'Диапазон соперника',
     textLabel: 'Текст диапазона',

@@ -1,0 +1,91 @@
+.recommendation-panel {
+  margin-top: 0.75rem;
+}
+
+.recommendation-disclaimer {
+  font-size: 0.8rem;
+  color: #8a939c;
+  margin: 0 0 0.65rem;
+}
+
+.recommendation-unavailable {
+  color: #9aa3ad;
+  margin: 0;
+}
+
+.recommendation-action {
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.recommendation-action[data-action='FOLD'] {
+  color: #c45c5c;
+}
+
+.recommendation-action[data-action='CALL'],
+.recommendation-action[data-action='CHECK'] {
+  color: #3d8f6a;
+}
+
+.recommendation-action[data-action='BET'],
+.recommendation-action[data-action='RAISE'] {
+  color: #c9a227;
+}
+
+.recommendation-sizing {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-left: 0.35rem;
+  color: #c5ccd4;
+}
+
+.recommendation-confidence {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+}
+
+.recommendation-block h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  color: #9aa3ad;
+  font-weight: 600;
+}
+
+.recommendation-block ul {
+  margin: 0 0 0.75rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.recommendation-block li {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+}
+
+.recommendation-metrics {
+  margin: 0 0 0.75rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.recommendation-metrics > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.recommendation-metrics dt {
+  color: #9aa3ad;
+}
+
+.recommendation-metrics dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.recommendation-warnings li {
+  color: #d4b35a;
+}
