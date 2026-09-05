@@ -49,6 +49,38 @@ Equity Engine
 
 `MAX_EXACT_COMBINATIONS = 20_000` — выше порога используется Monte Carlo.
 
+## Analysis / Ranges
+
+```text
+PokerState
+     +
+AnalysisState
+     |
+     +--> Opponent Model
+              |
+              +-- Random
+              +-- Exact
+              +-- Range
+                        |
+                        +--> Parser / Formatter
+                        +--> Matrix 13×13
+                        +--> Weights (0..1)
+                        +--> Blockers (Hero + Board)
+                              |
+                              v
+                         EquityInput
+                              |
+                              v
+                          Worker
+                              |
+                    Exact / Monte Carlo
+```
+
+- Range живёт в `AnalysisState`, не в `PokerState`.
+- 169 hand classes → 1326 physical combos (pair=6, suited=4, offsuit=12).
+- Random opponent ≠ poker range; user range ≠ strategy truth.
+- Strategic range presets запрещены на этом этапе.
+
 ## Betting core hardening
 
 ### Betting round completion
@@ -119,9 +151,9 @@ Shared Poker Core
 ├── PokerState
 ├── Betting Engine
 ├── Pot Engine
-├── Hand Evaluator   (позже)
-├── Equity Engine    (позже)
-└── Ranges           (позже)
+├── Hand Evaluator
+├── Equity Engine
+└── Ranges / AnalysisState
 
 Strategy (позже)
 ├── CashStrategyEngine
