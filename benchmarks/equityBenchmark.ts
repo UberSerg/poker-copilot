@@ -1,8 +1,18 @@
 /**
- * Equity / range micro-benchmarks.
+ * Equity / range / decision micro-benchmarks.
  * Run: npm run benchmark
  */
 import { performance } from 'node:perf_hooks'
+import { createInitialState } from '../src/domain/game/createInitialState'
+import { getLegalActions } from '../src/domain/game/legalActions'
+import {
+  analyzeBetContext,
+  analyzeBoardTexture,
+  analyzeHandContext,
+  analyzePositionContext,
+} from '../src/engine/analysis'
+import { createDecisionEngine } from '../src/engine/decision'
+import type { DecisionContext } from '../src/engine/decision'
 import { createEquityEngine, MC_PRESETS } from '../src/engine/equity'
 import { applyBlockers } from '../src/engine/ranges/blockers'
 import { parseRange } from '../src/engine/ranges/parser'
@@ -11,9 +21,9 @@ import { formatHandClass } from '../src/engine/ranges/HandClass'
 import { PokerRange } from '../src/engine/ranges/Range'
 
 const engine = createEquityEngine()
+const decisionEngine = createDecisionEngine()
 
 function bench(label: string, fn: () => void): number {
-  // Warm once
   fn()
   const start = performance.now()
   fn()
@@ -38,8 +48,57 @@ function percentRange(pct: number): PokerRange {
   return PokerRange.fromHandClassWeights(map)
 }
 
+function buildDecisionCtx(): DecisionContext {
+  const hero = ['As', 'Qd'] as const
+  const board = ['Qc', '8h', '3s'] as const
+  const pokerState = createInitialState({ heroPosition: 'BTN' })
+  const acting = {
+    ...pokerState,
+    street: 'FLOP' as const,
+    actingPosition: 'BTN' as const,
+    currentBet: 250,
+    players: {
+      ...pokerState.players,
+      BTN: { ...pokerState.players.BTN, committedThisStreet: 0, stackChips: 9750 },
+      BB: { ...pokerState.players.BB, committedThisStreet: 250, stackChips: 9650 },
+    },
+  }
+  const legal = getLegalActions(acting, 'BTN')
+  return {
+    pokerState: acting,
+    heroCards: hero,
+    board: [...board],
+    street: 'FLOP',
+    position: 'BTN',
+    opponentModel: { kind: 'RANGE', label: 'test', comboCount: 80 },
+    opponentMode: 'RANGE',
+    equity: {
+      wins: 600,
+      ties: 20,
+      losses: 380,
+      winProbability: 0.6,
+      tieProbability: 0.02,
+      lossProbability: 0.38,
+      equity: 0.61,
+      iterations: 1000,
+      method: 'EXACT',
+    },
+    potOdds: 0.28,
+    requiredEquity: 0.28,
+    amountToCall: 250,
+    spr: 4.5,
+    effectiveStack: 9000,
+    potChips: 650,
+    legal: { ...legal, fold: true, call: true, check: false, bet: false, raise: true },
+    boardTexture: analyzeBoardTexture(board),
+    handContext: analyzeHandContext(hero, board),
+    positionContext: analyzePositionContext('BTN'),
+    betContext: analyzeBetContext(650, 250),
+  }
+}
+
 function main(): void {
-  console.log('Poker Copilot equity / range benchmarks')
+  console.log('Poker Copilot equity / range / decision benchmarks')
   console.log('---')
 
   bench('A) River exact showdown', () => {
@@ -94,8 +153,7 @@ function main(): void {
   })
 
   bench('G) Blockers on 50% range', () => {
-    const range = percentRange(0.5)
-    applyBlockers(range, ['As', 'Kh', '2c', '7d', '9h'])
+    applyBlockers(percentRange(0.5), ['As', 'Kh', '2c', '7d', '9h'])
   })
 
   const hero10 = ['As', 'Qd'] as const
@@ -112,8 +170,7 @@ function main(): void {
   })
 
   const hero50 = ['As', 'Ah'] as const
-  const range50 = percentRange(0.5)
-  const combos50 = applyBlockers(range50, [...hero50]).toCombos()
+  const combos50 = applyBlockers(percentRange(0.5), [...hero50]).toCombos()
   bench('I) Preflop 50% range MC 50k', () => {
     engine.calculate({
       heroCards: hero50,
@@ -165,6 +222,13 @@ function main(): void {
       board: ['2c', '7d', '9h', 'Jc', '3s'],
       rangeCombos: riverCombos,
     })
+  })
+
+  const ctx = buildDecisionCtx()
+  bench('M) DecisionEngine ×10000', () => {
+    for (let i = 0; i < 10_000; i += 1) {
+      decisionEngine.evaluate(ctx)
+    }
   })
 }
 
