@@ -17,6 +17,7 @@
 - Range Engine (parser, weights, blockers, 13×13 matrix)
 - Decision Engine V1 (rule-based postflop assistant — **не GTO**)
 - Decision Intelligence: board texture, hand context, explanation sections, audit
+- Poker UI asset pack: sprite cards/buttons/table, navy analysis chrome (live panels)
 
 ## Текущий scope
 - Режим: **Cash** (6-max NLHE).
@@ -55,4 +56,6 @@ npm run benchmark
 - `docs/ARCHITECTURE.md`
 - `docs/GAME_MODES.md`
 - `docs/CURSOR_CONTRACT.md`
+- `docs/ASSETS.md`
+- `docs/UI_ARCHITECTURE.md`
 - `docs/MCP.md`
