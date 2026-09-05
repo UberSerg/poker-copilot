@@ -17,7 +17,12 @@ alwaysApply: false
 - Keep pot odds, SPR, equity and required equity as separate concepts.
 - Equity alone is not a complete decision policy.
 - A raise recommendation requires its own rationale; do not infer it merely from equity > required equity.
-- Range blockers must remove impossible combos.
+- Starting hands: exactly 169 classes; expanding all yields 1326 unique combos (pair=6, suited=4, offsuit=12).
+- Range blockers must remove impossible combos that share Hero or board cards.
+- Combo weights are in `[0, 1]`; weighted Monte Carlo sampling must be proportional to combo weight.
+- User-entered ranges are analysis assumptions, not strategy truth.
+- Do not invent strategic range presets (tight/loose/maniac, GTO charts) without a dedicated verified pack.
 - Exact enumeration and Monte Carlo results must identify which mode produced them.
 - Monte Carlo tests must be reproducible via seeded RNG.
-- If a third-party hand evaluator is used, wrap it behind `HandEvaluator` and verify it with golden tests.
+- If a third-party hand evaluator is used, wrap it behind `HandEvaluator` and verify it with golden + parity tests.
+- Analysis/opponent assumptions (range, precision) live outside `PokerState`.

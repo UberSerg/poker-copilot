@@ -1,6 +1,8 @@
 import type { EquityResult } from '../../engine/equity/types'
 import { MC_PRESETS } from '../../engine/equity/types'
 import type { PrecisionPreset } from '../../app/equityUiState'
+import type { RangeStats } from '../../engine/ranges/stats'
+import type { OpponentMode } from '../../engine/equity/types'
 import { ru } from '../../i18n/ru'
 import './EquityPanel.css'
 
@@ -11,10 +13,17 @@ interface EquityPanelProps {
   precision: PrecisionPreset
   onPrecisionChange: (precision: PrecisionPreset) => void
   blockedReason: string | null
+  opponentMode: OpponentMode
+  rangeStats: RangeStats | null
 }
 
 function pct(value: number): string {
   return `${(value * 100).toFixed(1)}%`
+}
+
+function formatWeighted(value: number): string {
+  const rounded = Math.round(value * 10) / 10
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)
 }
 
 export function EquityPanel({
@@ -24,10 +33,17 @@ export function EquityPanel({
   precision,
   onPrecisionChange,
   blockedReason,
+  opponentMode,
+  rangeStats,
 }: EquityPanelProps) {
+  const opponentLabel =
+    opponentMode === 'RANGE' ? ru.equity.vsRangeOpponent : ru.equity.opponent
+
   return (
     <section className="equity-panel" aria-labelledby="equity-title">
-      <h2 id="equity-title">{ru.equity.title}</h2>
+      <h2 id="equity-title">
+        {opponentMode === 'RANGE' ? ru.equity.vsRange : ru.equity.title}
+      </h2>
 
       <label className="equity-precision">
         {ru.equity.precision}
@@ -47,6 +63,23 @@ export function EquityPanel({
         </select>
       </label>
 
+      {opponentMode === 'RANGE' && rangeStats ? (
+        <dl className="equity-range-context">
+          <div>
+            <dt>{ru.range.combos}</dt>
+            <dd>{rangeStats.rawCombos}</dd>
+          </div>
+          <div>
+            <dt>{ru.range.afterBlockers}</dt>
+            <dd>{rangeStats.availableCombos}</dd>
+          </div>
+          <div>
+            <dt>{ru.range.weighted}</dt>
+            <dd>{formatWeighted(rangeStats.weightedAvailableCombos)}</dd>
+          </div>
+        </dl>
+      ) : null}
+
       {blockedReason ? <p className="equity-blocked">{blockedReason}</p> : null}
 
       {status === 'CALCULATING' ? (
@@ -65,7 +98,7 @@ export function EquityPanel({
             <dd>{pct(result.equity)}</dd>
           </div>
           <div>
-            <dt>{ru.equity.opponent}</dt>
+            <dt>{opponentLabel}</dt>
             <dd>{pct(1 - result.equity)}</dd>
           </div>
           <div>
@@ -90,7 +123,11 @@ export function EquityPanel({
             <dt>
               {result.method === 'EXACT' ? ru.equity.combinations : ru.equity.simulations}
             </dt>
-            <dd>{result.iterations.toLocaleString('ru-RU')}</dd>
+            <dd>
+              {result.method === 'EXACT' && opponentMode === 'RANGE'
+                ? formatWeighted(result.iterations)
+                : Math.round(result.iterations).toLocaleString('ru-RU')}
+            </dd>
           </div>
           {result.elapsedMs !== undefined ? (
             <div>

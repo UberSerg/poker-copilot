@@ -53,6 +53,15 @@ export function OpponentPanel({
           />
           {ru.equity.exactHand}
         </label>
+        <label>
+          <input
+            type="radio"
+            name="opp-mode"
+            checked={mode === 'RANGE'}
+            onChange={() => onModeChange('RANGE')}
+          />
+          {ru.equity.rangeHand}
+        </label>
       </div>
 
       {mode === 'EXACT' ? (
@@ -67,8 +76,10 @@ export function OpponentPanel({
             />
           ))}
         </div>
-      ) : (
+      ) : mode === 'RANDOM' ? (
         <p className="opponent-random-hint">{ru.equity.randomHint}</p>
+      ) : (
+        <p className="opponent-random-hint">{ru.equity.rangeHint}</p>
       )}
 
       <div className="combo-block">
@@ -76,7 +87,7 @@ export function OpponentPanel({
         <p>{heroComboLabel}</p>
       </div>
 
-      {showdown && heroHand && opponentHand ? (
+      {showdown && heroHand && opponentHand && mode === 'EXACT' ? (
         <div className="showdown-block">
           <h3>{ru.equity.showdown}</h3>
           <p>

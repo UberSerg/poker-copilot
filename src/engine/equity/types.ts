@@ -1,8 +1,9 @@
 import type { Card } from '../../domain/cards/Card'
+import type { WeightedCombo } from '../ranges/RangeCombo'
 
 export type EquityMode = 'EXACT' | 'MONTE_CARLO'
 
-export type OpponentMode = 'EXACT' | 'RANDOM'
+export type OpponentMode = 'EXACT' | 'RANDOM' | 'RANGE'
 
 export interface EquityInput {
   heroCards: readonly [Card, Card]
@@ -10,6 +11,11 @@ export interface EquityInput {
   opponentMode: OpponentMode
   /** Required when opponentMode === 'EXACT' */
   opponentCards?: readonly [Card, Card]
+  /**
+   * Required when opponentMode === 'RANGE'.
+   * Combos must already have blockers applied; weight in [0,1].
+   */
+  rangeCombos?: readonly WeightedCombo[]
   /** Preferred mode; engine may override to EXACT when cheap enough. */
   preferredMode?: EquityMode
   iterations?: number
@@ -35,6 +41,7 @@ export type EquityErrorCode =
   | 'INCOMPLETE_OPPONENT_HAND'
   | 'DUPLICATE_CARD'
   | 'NO_VALID_COMBINATIONS'
+  | 'RANGE_EMPTY_AFTER_BLOCKERS'
   | 'UNSUPPORTED'
 
 export interface EquityError {
@@ -48,8 +55,11 @@ export interface EquityEngine {
   calculate(input: EquityInput): EquityOutcome
 }
 
-/** Prefer exact when estimated board×opponent completions ≤ this threshold. */
+/** Prefer exact when estimated scenarios ≤ this threshold. */
 export const MAX_EXACT_COMBINATIONS = 20_000
+
+/** Alias used by range-aware estimator. */
+export const MAX_EXACT_SCENARIOS = MAX_EXACT_COMBINATIONS
 
 export const MC_PRESETS = {
   fast: 10_000,

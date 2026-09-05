@@ -72,3 +72,24 @@
     transform: rotate(360deg);
   }
 }
+
+.equity-range-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.equity-range-context div {
+  margin: 0;
+}
+
+.equity-range-context dt {
+  font-size: 0.75rem;
+  color: #9aa3ad;
+}
+
+.equity-range-context dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+}

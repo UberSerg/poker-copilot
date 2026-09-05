@@ -23,8 +23,15 @@ export interface HandMetrics {
   canAdvanceStreet: boolean
 }
 
-export function getUsedCards(state: PokerState): Set<Card> {
-  return collectUsedCards([...state.heroCards, ...state.opponentCards, ...state.board])
+export function getUsedCards(
+  state: PokerState,
+  options?: { includeOpponent?: boolean },
+): Set<Card> {
+  const includeOpponent = options?.includeOpponent ?? true
+  const cards = includeOpponent
+    ? [...state.heroCards, ...state.opponentCards, ...state.board]
+    : [...state.heroCards, ...state.board]
+  return collectUsedCards(cards)
 }
 
 export function getHandMetrics(state: PokerState, forPosition: Position = state.heroPosition): HandMetrics {

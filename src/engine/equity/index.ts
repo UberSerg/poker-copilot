@@ -26,12 +26,16 @@ export function createEquityEngine(): EquityEngine {
   return new DefaultEquityEngine()
 }
 
-export { shouldUseExactEnumeration, estimateExactCombinations } from './exact'
+export {
+  shouldUseExactEnumeration,
+  estimateExactCombinations,
+  estimateExactScenarios,
+} from './exact'
 export { calculateExact } from './exact'
 export { calculateMonteCarlo } from './monteCarlo'
 export { validateEquityInput } from './validateInput'
 export { createSeededRandom, sampleWithoutReplacement } from './rng'
-export { MAX_EXACT_COMBINATIONS, MC_PRESETS } from './types'
+export { MAX_EXACT_COMBINATIONS, MAX_EXACT_SCENARIOS, MC_PRESETS } from './types'
 export type {
   EquityEngine,
   EquityInput,

@@ -196,28 +196,38 @@ DoD:
 
 ---
 
-## V0.6 — Ranges V1
+## Equity Hardening — COMPLETE ✅
 
-Цель: recommendation engine должен оценивать не "силу руки", а Hero против предполагаемого диапазона.
+- Worker: каждый `calculate()` settle (success / CANCELLED / WORKER_ERROR).
+- Stale request и `terminate()` не оставляют dangling promises.
+- Native vs `@pokertools/evaluator` parity suite.
 
-Сделать:
-- Range notation: `AA`, `AKs`, `AQo`, `77+`, `AJs+`, диапазоны через запятую.
-- Matrix 13x13.
-- Presets:
-  - Очень тайтовый
-  - Тайтовый
-  - Регуляр
-  - Лузовый
-  - Очень лузовый
-  - Пользовательский
-- Position-aware preflop presets.
-- Удаление blocked combos с учётом Hero/Board.
-- Вес combo 0..1 заложить в модель, UI весов можно добавить позднее.
+---
+
+## V0.6 — Ranges V1 ✅
+
+**Ranges V1 — COMPLETE**
+**Range Parser — COMPLETE**
+**Range Matrix — COMPLETE**
+**Weighted Ranges — COMPLETE**
+**Blocker Engine — COMPLETE**
+**Equity vs Range — COMPLETE**
+
+Цель: считать equity Hero против предполагаемого диапазона (без recommendation).
+
+Сделано:
+- Range notation: `AA`, `AKs`, `AQo`, `77+`, `AJs+`, intervals, weights `AKs:50%`.
+- Matrix 13×13 (выше диагонали = suited).
+- Веса combo 0..1; last-token-wins.
+- Blockers Hero/Board.
+- Exact / Monte Carlo vs weighted range.
+- **Без** стратегических presets (тайтовый/лузовый и т.п.).
 
 DoD:
 - Парсер покрыт unit tests.
-- Отображается количество доступных combos.
+- Отображается количество доступных / weighted combos.
 - Blockers корректно уменьшают range.
+- One-combo range ≡ exact opponent.
 
 ---
 
