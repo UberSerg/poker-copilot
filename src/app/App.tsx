@@ -35,6 +35,8 @@ import { OpponentPanel } from '../ui/equity/OpponentPanel'
 import { ActionTimeline } from '../ui/history/ActionTimeline'
 import { MetricsPanel } from '../ui/metrics/MetricsPanel'
 import { RangeEditor } from '../ui/ranges/RangeEditor'
+import { RecommendationPanel } from '../ui/decision/RecommendationPanel'
+import { evaluateDecision } from './analysis/DecisionService'
 import { PokerTable } from '../ui/table/PokerTable'
 import { EquityWorkerClient } from '../workers/EquityWorkerClient'
 import {
@@ -173,6 +175,14 @@ export function App() {
     equityBlockedReason !== null ? ('IDLE' as const) : equityUi.status
   const equityResult = equityBlockedReason !== null ? null : equityUi.result
   const equityError = equityBlockedReason !== null ? null : equityUi.errorMessage
+
+  const recommendationView = useMemo(() => {
+    const outcome = evaluateDecision(state, analysis, equityResult)
+    if (!outcome.ok) {
+      return { kind: 'UNAVAILABLE' as const, message: outcome.message }
+    }
+    return { kind: 'RESULT' as const, result: outcome.result }
+  }, [state, analysis, equityResult])
 
   function pushState(next: PokerState) {
     setHistory((prev) => [...prev, state])
@@ -375,10 +385,7 @@ export function App() {
             canAdvance={metrics.canAdvanceStreet}
           />
           <ActionTimeline history={state.actionHistory} bigBlind={state.bigBlind} />
-          <section className="recommendation-panel" aria-labelledby="recommendation-title">
-            <h2 id="recommendation-title">{ru.panels.recommendation}</h2>
-            <p>{ru.labels.recommendationSoon}</p>
-          </section>
+          <RecommendationPanel view={recommendationView} />
           {import.meta.env.DEV ? (
             <section className="debug-panel">
               <button type="button" onClick={() => setShowJson((value) => !value)}>
