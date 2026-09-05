@@ -1,17 +1,24 @@
-import type { AnalysisState } from '../analysis/AnalysisState'
+import type { AnalysisState } from './AnalysisState'
 import { getBoardCards, hasHeroCards, hasOpponentCards } from '../../domain/game/equitySelectors'
 import { getLegalActions } from '../../domain/game/legalActions'
 import type { PokerState } from '../../domain/game/PokerState'
 import { getHandMetrics } from '../../domain/game/selectors'
-import type { EquityResult } from '../../engine/equity/types'
+import {
+  analyzeBetContext,
+  analyzeBoardTexture,
+  analyzeHandContext,
+  analyzePositionContext,
+} from '../../engine/analysis'
 import {
   createDecisionEngine,
   type DecisionContext,
   type DecisionOpponentModel,
   type DecisionResult,
 } from '../../engine/decision'
+import type { EquityResult } from '../../engine/equity/types'
 import { applyBlockers } from '../../engine/ranges/blockers'
 import { formatRange } from '../../engine/ranges/formatter'
+import type { Card } from '../../domain/cards/Card'
 
 export type DecisionServiceOutcome =
   | { ok: true; result: DecisionResult }
@@ -25,10 +32,6 @@ export type DecisionUnavailableCode =
   | 'INCOMPLETE_OPPONENT'
   | 'ROUND_INACTIVE'
 
-/**
- * Application-layer bridge: PokerState + AnalysisState + EquityResult → DecisionEngine.
- * Does not call EquityEngine itself.
- */
 export function evaluateDecision(
   poker: PokerState,
   analysis: AnalysisState,
@@ -70,12 +73,8 @@ export function evaluateDecision(
 
   const metrics = getHandMetrics(poker)
   const legal = getLegalActions(poker, poker.heroPosition)
-  if (legal.roundComplete && metrics.amountToCallChips === 0 && !legal.check && !legal.bet) {
-    // Still allow evaluation for display when hero to act would be none — soft message
-  }
-
   const board = getBoardCards(poker)
-  const heroCards = [poker.heroCards[0]!, poker.heroCards[1]!] as const
+  const heroCards: [Card, Card] = [poker.heroCards[0]!, poker.heroCards[1]!]
   const opponentModel = buildOpponentModel(poker, analysis, heroCards, board)
 
   const context: DecisionContext = {
@@ -94,17 +93,20 @@ export function evaluateDecision(
     effectiveStack: metrics.effectiveStackChips,
     potChips: metrics.potChips,
     legal,
+    boardTexture: analyzeBoardTexture(board),
+    handContext: analyzeHandContext(heroCards, board),
+    positionContext: analyzePositionContext(poker.heroPosition),
+    betContext: analyzeBetContext(metrics.potChips, metrics.amountToCallChips),
   }
 
   const engine = createDecisionEngine()
   const started = performance.now()
   const result = engine.evaluate(context)
   const elapsed = performance.now() - started
-  if (elapsed > 10) {
-    // Soft signal only in metrics via warning — keep sync API
+  if (elapsed > 20) {
     result.warnings = [
       ...result.warnings,
-      `Decision Engine занял ${elapsed.toFixed(1)} ms (ожидалось <10 ms)`,
+      `Decision Engine занял ${elapsed.toFixed(1)} ms (цель <20 ms)`,
     ]
   }
 
@@ -114,8 +116,8 @@ export function evaluateDecision(
 function buildOpponentModel(
   poker: PokerState,
   analysis: AnalysisState,
-  heroCards: readonly [import('../../domain/cards/Card').Card, import('../../domain/cards/Card').Card],
-  board: readonly import('../../domain/cards/Card').Card[],
+  heroCards: readonly [Card, Card],
+  board: readonly Card[],
 ): DecisionOpponentModel {
   if (analysis.opponentMode === 'EXACT') {
     return {

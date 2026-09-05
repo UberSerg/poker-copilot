@@ -8,6 +8,8 @@ export type RecommendationView =
 
 interface RecommendationPanelProps {
   view: RecommendationView
+  showAudit?: boolean
+  onToggleAudit?: () => void
 }
 
 function confidenceRu(c: DecisionConfidence): string {
@@ -24,7 +26,11 @@ function pct(value: number): string {
   return `${(value * 100).toFixed(1)}%`
 }
 
-export function RecommendationPanel({ view }: RecommendationPanelProps) {
+export function RecommendationPanel({
+  view,
+  showAudit = false,
+  onToggleAudit,
+}: RecommendationPanelProps) {
   return (
     <section className="recommendation-panel" aria-labelledby="recommendation-title">
       <h2 id="recommendation-title">{ru.panels.recommendation}</h2>
@@ -50,15 +56,6 @@ export function RecommendationPanel({ view }: RecommendationPanelProps) {
           <p className="recommendation-confidence">
             {ru.decision.confidence}: <strong>{confidenceRu(view.result.confidence)}</strong>
           </p>
-
-          <div className="recommendation-block">
-            <h3>{ru.decision.why}</h3>
-            <ul>
-              {view.result.reasons.map((reason) => (
-                <li key={reason}>✓ {reason}</li>
-              ))}
-            </ul>
-          </div>
 
           <div className="recommendation-block">
             <h3>{ru.decision.metrics}</h3>
@@ -90,6 +87,23 @@ export function RecommendationPanel({ view }: RecommendationPanelProps) {
             </dl>
           </div>
 
+          <div className="recommendation-block">
+            <h3>{ru.decision.why}</h3>
+            {(view.result.explanationSections?.length
+              ? view.result.explanationSections
+              : [{ title: '', items: view.result.reasons }]
+            ).map((section) => (
+              <div key={section.title || 'reasons'} className="recommendation-section">
+                {section.title ? <h4>{section.title}</h4> : null}
+                <ul>
+                  {section.items.map((item) => (
+                    <li key={item}>✓ {item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
           {view.result.warnings.length > 0 ? (
             <div className="recommendation-block recommendation-warnings">
               <h3>{ru.decision.warnings}</h3>
@@ -99,6 +113,16 @@ export function RecommendationPanel({ view }: RecommendationPanelProps) {
                 ))}
               </ul>
             </div>
+          ) : null}
+
+          {onToggleAudit ? (
+            <button type="button" className="recommendation-audit-toggle" onClick={onToggleAudit}>
+              {showAudit ? ru.decision.hideAudit : ru.decision.showAudit}
+            </button>
+          ) : null}
+
+          {showAudit && view.result.audit ? (
+            <pre className="recommendation-audit">{JSON.stringify(view.result.audit, null, 2)}</pre>
           ) : null}
         </>
       )}

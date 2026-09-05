@@ -71,6 +71,7 @@ export function App() {
   const [slot, setSlot] = useState<CardSlot | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showJson, setShowJson] = useState(false)
+  const [showDecisionAudit, setShowDecisionAudit] = useState(false)
   const [analysis, setAnalysis] = useState<AnalysisState>(() => createInitialAnalysisState())
   const [equityUi, setEquityUi] = useState<EquityCalculationState>(() => createInitialEquityUiState())
   const [selectedRangeKey, setSelectedRangeKey] = useState<string | null>(null)
@@ -385,7 +386,15 @@ export function App() {
             canAdvance={metrics.canAdvanceStreet}
           />
           <ActionTimeline history={state.actionHistory} bigBlind={state.bigBlind} />
-          <RecommendationPanel view={recommendationView} />
+          <RecommendationPanel
+            view={recommendationView}
+            showAudit={import.meta.env.DEV && showDecisionAudit}
+            onToggleAudit={
+              import.meta.env.DEV
+                ? () => setShowDecisionAudit((v) => !v)
+                : undefined
+            }
+          />
           {import.meta.env.DEV ? (
             <section className="debug-panel">
               <button type="button" onClick={() => setShowJson((value) => !value)}>

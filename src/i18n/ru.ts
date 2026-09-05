@@ -102,6 +102,8 @@ export const ru = {
     metrics: 'Метрики',
     warnings: 'Предупреждения',
     required: 'Требуется',
+    showAudit: 'Показать анализ',
+    hideAudit: 'Скрыть анализ',
     actions: {
       FOLD: 'FOLD',
       CHECK: 'CHECK',

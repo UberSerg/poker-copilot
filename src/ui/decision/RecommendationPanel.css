@@ -89,3 +89,30 @@
 .recommendation-warnings li {
   color: #d4b35a;
 }
+
+.recommendation-section h4 {
+  margin: 0.35rem 0 0.2rem;
+  font-size: 0.8rem;
+  color: #b8c0c8;
+}
+
+.recommendation-audit-toggle {
+  margin-top: 0.5rem;
+  border: 1px solid #3a4552;
+  background: #1c232c;
+  color: #d7dee6;
+  border-radius: 4px;
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.recommendation-audit {
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  overflow: auto;
+  max-height: 220px;
+  background: #12161c;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
