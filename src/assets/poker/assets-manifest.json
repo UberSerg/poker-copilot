@@ -1,0 +1,61 @@
+{
+  "pack": "poker-ui-asset-pack",
+  "version": "v1",
+  "notes": [
+    "Buttons may be used as static raster assets.",
+    "All other dynamic texts must be rendered by the UI, not baked into images.",
+    "style_reference_panels.png and mixed_reference_sheet.png are style references, not direct final runtime UI with embedded text."
+  ],
+  "assets": [
+    {
+      "path": "cards/hearts_sheet.png",
+      "type": "production",
+      "usage": "13 heart cards sprite sheet"
+    },
+    {
+      "path": "cards/diamonds_sheet.png",
+      "type": "production",
+      "usage": "13 diamond cards sprite sheet"
+    },
+    {
+      "path": "cards/clubs_sheet.png",
+      "type": "production",
+      "usage": "13 club cards sprite sheet"
+    },
+    {
+      "path": "cards/spades_sheet.png",
+      "type": "production",
+      "usage": "13 spade cards sprite sheet"
+    },
+    {
+      "path": "cards/card_backs_and_frames.png",
+      "type": "production-plus-reference",
+      "usage": "card backs, hover/selection/locked frames"
+    },
+    {
+      "path": "table/table_and_markers.png",
+      "type": "production",
+      "usage": "6-max table, dealer button, hero badge, seat rings, acting arrow"
+    },
+    {
+      "path": "chips/chips_and_tokens.png",
+      "type": "production",
+      "usage": "chips, chip stacks, all-in token, blind tokens, amount medallion"
+    },
+    {
+      "path": "buttons/static_buttons.png",
+      "type": "production",
+      "usage": "static action buttons with fixed labels"
+    },
+    {
+      "path": "ui/style_reference_panels.png",
+      "type": "style-reference",
+      "usage": "visual language for panels, tabs, inputs, tooltips, progress bars; do not use embedded text as final runtime content"
+    },
+    {
+      "path": "reference/mixed_reference_sheet.png",
+      "type": "style-reference",
+      "usage": "overall moodboard and consistency reference"
+    }
+  ]
+}

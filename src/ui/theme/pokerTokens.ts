@@ -1,0 +1,43 @@
+/** Design tokens for premium poker UI (navy / felt / gold). */
+export const pokerTokens = {
+  color: {
+    felt: '#0f3d22',
+    feltLight: '#1f6b3a',
+    wood: '#5b3a1e',
+    woodDark: '#3a2412',
+    gold: '#d4a84b',
+    goldBright: '#f0c868',
+    navy: '#0b1220',
+    navyPanel: '#121a2b',
+    steel: '#1c2740',
+    steelBorder: '#2a3a5c',
+    text: '#e8eef8',
+    textMuted: '#9aa8c0',
+    actionFold: '#b33a3a',
+    actionCheck: '#3d4a5c',
+    actionCall: '#2f8a55',
+    actionBet: '#c9a227',
+    actionRaise: '#d17a2a',
+    info: '#3b82c4',
+    success: '#3d8f6a',
+    warning: '#d4b35a',
+    danger: '#c45c5c',
+  },
+  radius: {
+    sm: '0.35rem',
+    md: '0.55rem',
+    lg: '0.85rem',
+    pill: '999px',
+  },
+  shadow: {
+    panel: '0 8px 28px rgba(0, 0, 0, 0.35)',
+    glowGold: '0 0 12px rgba(212, 168, 75, 0.45)',
+    glowActing: '0 0 14px rgba(80, 220, 120, 0.55)',
+  },
+  z: {
+    table: 1,
+    seats: 2,
+    cards: 3,
+    overlay: 4,
+  },
+} as const

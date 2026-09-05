@@ -2,6 +2,7 @@ node_modules/
 dist/
 coverage/
 .vite/
+.vitest/
 .tmp/
 .env
 .env.*
