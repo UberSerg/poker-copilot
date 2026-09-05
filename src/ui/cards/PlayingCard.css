@@ -1,47 +1,55 @@
 .playing-card {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  display: inline-block;
   width: 2.6rem;
-  height: 3.5rem;
-  border: 1px solid #2a3a2a;
+  height: auto;
+  aspect-ratio: 5 / 7;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0.35rem;
-  background: #f4f7f0;
+  background-color: #0a0f18;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0;
   line-height: 1;
   padding: 0;
+  color: transparent;
 }
 
 .playing-card-large {
   width: 3.6rem;
-  height: 5rem;
-  font-size: 1.35rem;
 }
 
 .playing-card-empty {
-  color: #6a7a66;
-  background: rgba(255, 255, 255, 0.2);
   border-style: dashed;
-}
-
-.playing-card-red {
-  color: #c62828;
-}
-
-.playing-card-black {
-  color: #1b1f1b;
+  border-color: rgba(154, 168, 192, 0.35);
 }
 
 .playing-card-selected {
-  outline: 2px solid #f0c040;
+  outline: 2px solid var(--poker-gold, #f0c040);
   outline-offset: 2px;
+  box-shadow: var(--poker-shadow-glow-gold, 0 0 12px rgba(212, 168, 75, 0.45));
 }
 
 .playing-card-clickable {
   cursor: pointer;
 }
 
+.playing-card-clickable:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
 .playing-card:disabled {
   cursor: default;
+}
+
+.playing-card-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

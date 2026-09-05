@@ -5,6 +5,7 @@ import { canEditHandSetup } from '../../domain/game/raiseRights'
 import { formatChipsAsBb } from '../../domain/game/selectors'
 import { ru } from '../../i18n/ru'
 import { PlayingCard } from '../cards/PlayingCard'
+import { tableBackgroundStyle } from '../theme/spriteMap'
 import { PlayerSeat } from './PlayerSeat'
 import './PokerTable.css'
 
@@ -38,7 +39,7 @@ export function PokerTable({
 
   return (
     <section className="poker-table-wrap" aria-label={ru.panels.table}>
-      <div className="poker-table">
+      <div className="poker-table" style={tableBackgroundStyle()}>
         {(Object.keys(SEAT_CLASS) as Position[]).map((position) => (
           <div key={position} className={`seat-anchor ${SEAT_CLASS[position]}`}>
             <PlayerSeat
