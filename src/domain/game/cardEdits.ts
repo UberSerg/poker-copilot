@@ -3,8 +3,12 @@ import type { BoardCards, HeroCards } from './PokerAction'
 import type { DomainResult, PokerState } from './PokerState'
 import { getUsedCards } from './selectors'
 
-function usedWithout(state: PokerState, exclude: Card | null): Set<Card> {
-  const used = getUsedCards(state)
+function usedWithout(
+  state: PokerState,
+  exclude: Card | null,
+  options?: { includeOpponent?: boolean },
+): Set<Card> {
+  const used = getUsedCards(state, options)
   if (exclude) {
     used.delete(exclude)
   }
@@ -18,7 +22,8 @@ export function setHeroCard(
 ): DomainResult<PokerState> {
   const previous = state.heroCards[index]
   if (card !== null) {
-    const used = usedWithout(state, previous)
+    // Opponent hole cards are analysis-only when not in exact mode; do not block Hero/Board.
+    const used = usedWithout(state, previous, { includeOpponent: false })
     if (used.has(card)) {
       return { ok: false, error: { code: 'DUPLICATE_CARD', message: 'Card is already used' } }
     }
@@ -40,7 +45,7 @@ export function setBoardCard(
 ): DomainResult<PokerState> {
   const previous = state.board[index]
   if (card !== null) {
-    const used = usedWithout(state, previous)
+    const used = usedWithout(state, previous, { includeOpponent: false })
     if (used.has(card)) {
       return { ok: false, error: { code: 'DUPLICATE_CARD', message: 'Card is already used' } }
     }
@@ -62,7 +67,7 @@ export function setOpponentCard(
 ): DomainResult<PokerState> {
   const previous = state.opponentCards[index]
   if (card !== null) {
-    const used = usedWithout(state, previous)
+    const used = usedWithout(state, previous, { includeOpponent: true })
     if (used.has(card)) {
       return { ok: false, error: { code: 'DUPLICATE_CARD', message: 'Card is already used' } }
     }

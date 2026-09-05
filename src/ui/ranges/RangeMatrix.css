@@ -1,0 +1,61 @@
+.range-matrix-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.range-matrix {
+  border-collapse: collapse;
+  font-size: 0.65rem;
+  user-select: none;
+}
+
+.range-matrix th {
+  color: #9aa3ad;
+  font-weight: 600;
+  padding: 0.15rem;
+}
+
+.range-cell {
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  margin: 1px;
+  border: 1px solid #2a323c;
+  border-radius: 3px;
+  background: #1a1f26;
+  color: #c5ccd4;
+  cursor: pointer;
+  font: inherit;
+}
+
+.range-cell--suited {
+  background: #1c2a22;
+}
+
+.range-cell--offsuit {
+  background: #1a1f26;
+}
+
+.range-cell--pair {
+  background: #242018;
+}
+
+.range-cell--on.range-cell--suited {
+  background: #2f6b4f;
+  color: #f4fff8;
+}
+
+.range-cell--on.range-cell--offsuit {
+  background: #3a5f8a;
+  color: #f0f6ff;
+}
+
+.range-cell--on.range-cell--pair {
+  background: #8a6a2a;
+  color: #fff8e8;
+}
+
+.range-cell--selected {
+  outline: 2px solid #e8c36a;
+  outline-offset: -1px;
+}

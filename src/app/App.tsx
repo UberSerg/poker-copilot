@@ -13,8 +13,8 @@ import {
   setPlayerStartingStackBb,
 } from '../domain/game'
 import {
-  buildEquityInput,
   formatHeroComboRu,
+  getBoardCards,
   getHeroEvaluatedHand,
   getOpponentEvaluatedHand,
   getShowdownResult,
@@ -26,14 +26,26 @@ import type { Position } from '../domain/game/Position'
 import type { DomainError } from '../domain/game/PokerState'
 import { MC_PRESETS } from '../engine/equity/types'
 import type { OpponentMode } from '../engine/equity/types'
+import { formatHandClass, type HandClass } from '../engine/ranges/HandClass'
+import type { RangeStats } from '../engine/ranges/stats'
 import { ActionPanel } from '../ui/actions/ActionPanel'
 import { CardPicker } from '../ui/cards/CardPicker'
 import { EquityPanel } from '../ui/equity/EquityPanel'
 import { OpponentPanel } from '../ui/equity/OpponentPanel'
 import { ActionTimeline } from '../ui/history/ActionTimeline'
 import { MetricsPanel } from '../ui/metrics/MetricsPanel'
+import { RangeEditor } from '../ui/ranges/RangeEditor'
 import { PokerTable } from '../ui/table/PokerTable'
 import { EquityWorkerClient } from '../workers/EquityWorkerClient'
+import {
+  createInitialAnalysisState,
+  setEquityPrecision,
+  setOpponentMode,
+  setRangeFromText,
+  setRangeModel,
+  type AnalysisState,
+} from './analysis/AnalysisState'
+import { buildAnalysisEquityInput } from './analysis/equityInputSelector'
 import {
   createInitialEquityUiState,
   type EquityCalculationState,
@@ -57,15 +69,37 @@ export function App() {
   const [slot, setSlot] = useState<CardSlot | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showJson, setShowJson] = useState(false)
+  const [analysis, setAnalysis] = useState<AnalysisState>(() => createInitialAnalysisState())
   const [equityUi, setEquityUi] = useState<EquityCalculationState>(() => createInitialEquityUiState())
+  const [selectedRangeKey, setSelectedRangeKey] = useState<string | null>(null)
   const workerRef = useRef<EquityWorkerClient | null>(null)
 
   const metrics = useMemo(() => getHandMetrics(state), [state])
-  const used = useMemo(() => getUsedCards(state), [state])
+  const used = useMemo(
+    () =>
+      getUsedCards(state, {
+        includeOpponent: analysis.opponentMode === 'EXACT',
+      }),
+    [state, analysis.opponentMode],
+  )
   const heroHand = useMemo(() => getHeroEvaluatedHand(state), [state])
   const opponentHand = useMemo(() => getOpponentEvaluatedHand(state), [state])
   const showdown = useMemo(() => getShowdownResult(state), [state])
   const heroComboLabel = useMemo(() => formatHeroComboRu(state), [state])
+  const knownForRange = useMemo(() => {
+    const hero = state.heroCards.filter((c): c is Card => c !== null)
+    return [...hero, ...getBoardCards(state)]
+  }, [state])
+
+  const equityBuild = useMemo(
+    () => buildAnalysisEquityInput(state, analysis, MC_PRESETS[analysis.equityPrecision]),
+    [state, analysis],
+  )
+  const rangeStats: RangeStats | null =
+    equityBuild.ok && analysis.opponentMode === 'RANGE'
+      ? (equityBuild.rangeStats ?? null)
+      : null
+  const equityBlockedReason = equityBuild.ok ? null : equityBuild.reason
 
   useEffect(() => {
     workerRef.current = new EquityWorkerClient()
@@ -76,9 +110,7 @@ export function App() {
   }, [])
 
   useEffect(() => {
-    const iterations = MC_PRESETS[equityUi.precision]
-    const built = buildEquityInput(state, equityUi.opponentMode, iterations)
-    if (!built.ok) {
+    if (!equityBuild.ok) {
       return
     }
 
@@ -93,9 +125,12 @@ export function App() {
         errorMessage: null,
       }))
 
-      void client.calculate(built.input).then((response) => {
+      void client.calculate(equityBuild.input).then((response) => {
         if (cancelled) return
         if (!response.ok) {
+          if (response.code === 'CANCELLED') {
+            return
+          }
           setEquityUi((prev) => ({
             ...prev,
             status: 'ERROR',
@@ -106,10 +141,14 @@ export function App() {
         }
         const outcome = response.outcome
         if (!outcome.ok) {
+          const message =
+            outcome.error.code === 'RANGE_EMPTY_AFTER_BLOCKERS'
+              ? ru.equity.rangeEmptyAfterBlockers
+              : ru.equity.calcFailed
           setEquityUi((prev) => ({
             ...prev,
             status: 'ERROR',
-            errorMessage: ru.equity.calcFailed,
+            errorMessage: message,
             result: null,
           }))
           return
@@ -122,23 +161,16 @@ export function App() {
           requestId: response.requestId,
         }))
       })
-    }, 80)
+    }, 120)
 
     return () => {
       cancelled = true
       window.clearTimeout(timer)
     }
-  }, [state, equityUi.opponentMode, equityUi.precision])
-
-  const equityBlockedReason = useMemo(() => {
-    const built = buildEquityInput(state, equityUi.opponentMode, MC_PRESETS[equityUi.precision])
-    return built.ok ? null : built.reason
-  }, [state, equityUi.opponentMode, equityUi.precision])
+  }, [equityBuild])
 
   const equityStatus =
-    equityBlockedReason !== null
-      ? ('IDLE' as const)
-      : equityUi.status
+    equityBlockedReason !== null ? ('IDLE' as const) : equityUi.status
   const equityResult = equityBlockedReason !== null ? null : equityUi.result
   const equityError = equityBlockedReason !== null ? null : equityUi.errorMessage
 
@@ -230,11 +262,23 @@ export function App() {
   }
 
   function handleOpponentMode(mode: OpponentMode) {
-    setEquityUi((prev) => ({ ...prev, opponentMode: mode }))
+    setAnalysis((prev) => setOpponentMode(prev, mode))
   }
 
   function handlePrecision(precision: PrecisionPreset) {
-    setEquityUi((prev) => ({ ...prev, precision }))
+    setAnalysis((prev) => setEquityPrecision(prev, precision))
+  }
+
+  function handleRangeText(text: string) {
+    setAnalysis((prev) => setRangeFromText(prev, text))
+  }
+
+  function handleRangeModel(range: AnalysisState['range']) {
+    setAnalysis((prev) => setRangeModel(prev, range))
+  }
+
+  function handleSelectHand(hand: HandClass | null) {
+    setSelectedRangeKey(hand ? formatHandClass(hand) : null)
   }
 
   return (
@@ -284,6 +328,18 @@ export function App() {
               onClose={() => setSlot(null)}
             />
           ) : null}
+          {analysis.opponentMode === 'RANGE' ? (
+            <RangeEditor
+              range={analysis.range}
+              rangeText={analysis.rangeText}
+              parseError={analysis.rangeParseError}
+              knownCards={knownForRange}
+              selectedKey={selectedRangeKey}
+              onTextChange={handleRangeText}
+              onRangeChange={handleRangeModel}
+              onSelectHand={handleSelectHand}
+            />
+          ) : null}
         </div>
 
         <aside className="app-sidebar">
@@ -292,12 +348,14 @@ export function App() {
             status={equityStatus}
             result={equityResult}
             errorMessage={equityError}
-            precision={equityUi.precision}
+            precision={analysis.equityPrecision}
             onPrecisionChange={handlePrecision}
             blockedReason={equityBlockedReason}
+            opponentMode={analysis.opponentMode}
+            rangeStats={analysis.opponentMode === 'RANGE' ? rangeStats : null}
           />
           <OpponentPanel
-            mode={equityUi.opponentMode}
+            mode={analysis.opponentMode}
             cards={state.opponentCards}
             selectedSlot={selectedSlotKey()}
             onModeChange={handleOpponentMode}
