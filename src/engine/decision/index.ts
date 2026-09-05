@@ -5,12 +5,15 @@ export type {
   DecisionMetrics,
   DecisionResult,
   DecisionSizing,
+  ExplanationSection,
+  DecisionAudit,
 } from './DecisionResult'
 export {
   createDecisionEngine,
   RuleBasedDecisionEngine,
   type DecisionEngine,
 } from './DecisionEngine'
+export { calculateConfidence } from './confidence'
 export {
   DECISION_SAFETY_MARGIN,
   BET_EQUITY_THRESHOLD,
